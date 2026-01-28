@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controllers/classroom_controller.dart';
 import '../../../shared/widgets/custom_app_bar.dart'; 
+import '../../auth/controller/auth_controller.dart';
 
-class OpenQuestionScreen extends StatefulWidget {
-  const OpenQuestionScreen({super.key});
+class ClassroomListScreen extends StatefulWidget {
+  const ClassroomListScreen({super.key});
 
   @override
-  State<OpenQuestionScreen> createState() => _OpenQuestionScreenState();
+  State<ClassroomListScreen> createState() => _ClassroomListScreenState();
 }
 
-class _OpenQuestionScreenState extends State<OpenQuestionScreen> {
+class _ClassroomListScreenState extends State<ClassroomListScreen> {
   @override
   void initState() {
     super.initState();
@@ -59,34 +60,41 @@ class _OpenQuestionScreenState extends State<OpenQuestionScreen> {
   }
 
   Widget _buildProfileSection() {
-    return Row(
-      children: [
-        const CircleAvatar(
-          radius: 25,
-          backgroundImage: NetworkImage(
-            "https://static.wikia.nocookie.net/dublagem/images/d/d2/Raposo.jpg/revision/latest/thumbnail/width/360/height/360?cb=20240405221148&path-prefix=pt-br",
+  return Consumer<AuthController>( // 🆕 USAR CONSUMER
+    builder: (context, authController, _) {
+      // 🆕 OBTER NOME DO USUÁRIO DO CONTROLLER
+      final userName = authController.userName ?? "Professor";
+      
+      return Row(
+        children: [
+          const CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+              "https://static.wikia.nocookie.net/dublagem/images/d/d2/Raposo.jpg/revision/latest/thumbnail/width/360/height/360?cb=20240405221148&path-prefix=pt-br",
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              "Alex Raposo",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                userName, // ✅ AGORA userName ESTÁ DEFINIDO
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
               ),
-            ),
-            Text(
-              "Professor",
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+              const Text(
+                "Professor",
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ],
+          ),
+        ],
+      );
+    },
+  );
+}
 
 
   Widget _buildClassroomsList() {

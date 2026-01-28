@@ -31,6 +31,7 @@ class AuthService {
             final token = data["data"]["token"] ?? "";
             final refreshToken = data["data"]["refresh_token"] ?? "";
             final user = data["data"]["user"] ?? {};
+            final userName = user["name"] ?? user["username"] ?? username;
 
             // 🚨 CORREÇÃO: Pegar as roles do campo correto "user_role"
             final userRoles = data["data"]["user_role"] ?? [];
@@ -49,6 +50,7 @@ class AuthService {
             await prefs.setString("refresh_token", refreshToken);
             await prefs.setString("user", jsonEncode(user));
             await prefs.setString("roles", jsonEncode(roles));
+            await prefs.setString("user_name", userName);
 
             print("✅ [AuthService] Login bem-sucedido. Token salvo.");
             print("👤 Usuário: $user");

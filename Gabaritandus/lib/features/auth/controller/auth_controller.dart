@@ -13,14 +13,22 @@ class AuthController extends ChangeNotifier {
   Map<String, dynamic>? _user;
   bool _saveInfo = false; // Controlar checkbox
   bool _passwordVisible = false; // Controlar visibilidade da senha
+  String? _userName;
 
   // Getters públicos
   bool get loading => _loading;
   String? get error => _error;
   Map<String, dynamic>? get user => _user;
   bool get saveInfo => _saveInfo; // Getter para checkbox
-  bool get passwordVisible =>
-      _passwordVisible; // Getter para visibilidade da senha
+  bool get passwordVisible => _passwordVisible; // Getter para visibilidade da senha
+  String? get userName => _userName;
+
+  Future<String?> loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userName = prefs.getString("user_name");
+    notifyListeners();
+    return _userName;
+  }
 
   // Método para alternar visibilidade da senha
   void togglePasswordVisibility() {
@@ -87,6 +95,7 @@ class AuthController extends ChangeNotifier {
 
     if (response != null) {
       //Busca os dados salvos no SharedPreferences após login bem-sucedido
+      await loadUserName();
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString("user");
       final rolesJson = prefs.getString("roles");
@@ -113,7 +122,7 @@ class AuthController extends ChangeNotifier {
         }
       }
 
-      // 🆕 SALVAR INFORMAÇÕES SE SOLICITADO
+      // SALVAR INFORMAÇÕES SE SOLICITADO
       if (_saveInfo) {
         await _saveLoginInfo(username, password);
       } else {
@@ -195,6 +204,7 @@ class AuthController extends ChangeNotifier {
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
+    _userName = null;
     notifyListeners();
   }
 }

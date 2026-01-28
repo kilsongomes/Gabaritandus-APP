@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 
 // Import das telas
 import 'features/auth/presentation/login_screen.dart';
-import 'features/home/presentation/home_screen.dart';
-import 'features/classrooms/screens/classoom_list_screen.dart';
+import 'features/classrooms/screens/classroom_list_screen.dart';
 import 'features/classrooms/screens/student_list_screen.dart';
 import '/answer_sheets/screens/capture_screen.dart';
 import 'features/home/presentation/info_screen.dart';
@@ -15,17 +14,18 @@ class AppRouter {
     switch (settings.name) {
       case '/info':
         return MaterialPageRoute(builder: (_) => const InfoScreen());
+
       case '/login':
         return MaterialPageRoute(builder: (_) => const LoginScreen());
-      case '/home':
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
-      case '/questions':
+
+      case '/classrooms':
         return MaterialPageRoute(
           builder: (_) => ChangeNotifierProvider(
             create: (_) => ClassroomController(),
-            child: const OpenQuestionScreen(),
+            child: const ClassroomListScreen(),
           ),
         );
+
       case '/student-list':
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -34,21 +34,22 @@ class AppRouter {
             child: StudentListScreen(
               turma: args["turma"],
               escola: args["escola"],
-              roomId: args["roomId"], // 🆕 Passando o roomId
+              roomId: args["roomId"], 
             ),
           ),
         );
+
       case '/capture':
         final args = settings.arguments as Map<String, dynamic>;
-  return MaterialPageRoute(
-    builder: (_) => CaptureScreen(
-      studentId: args["studentId"],
-      studentName: args["studentName"],
-      classroomId: args["classroomId"],
-      classroomName: args["classroomName"],
-      discipline: args["discipline"],
-    ),
-  );
+        return MaterialPageRoute(
+          builder: (_) => CaptureScreen(
+            studentId: args["studentId"],
+            studentName: args["studentName"],
+            classroomId: args["classroomId"],
+            classroomName: args["classroomName"],
+            discipline: args["discipline"],
+          ),
+        );
 
       default:
         return MaterialPageRoute(
