@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controllers/classroom_controller.dart';
-import '../../../shared/widgets/custom_app_bar.dart'; 
+import '../../../shared/widgets/custom_app_bar.dart';
 import '../../auth/controller/auth_controller.dart';
 
 class ClassroomListScreen extends StatefulWidget {
@@ -17,7 +17,10 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
     super.initState();
     // Carregar turmas quando a tela for aberta
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = Provider.of<ClassroomController>(context, listen: false);
+      final controller = Provider.of<ClassroomController>(
+        context,
+        listen: false,
+      );
       controller.loadUserClassrooms();
     });
   }
@@ -25,10 +28,7 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar( 
-        title: "Turmas",
-        showBackButton: true,
-      ),
+      appBar: const CustomAppBar(title: "Turmas", showBackButton: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -50,7 +50,6 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
             ),
             const SizedBox(height: 16),
 
-
             // Lista de turmas
             _buildClassroomsList(),
           ],
@@ -60,51 +59,60 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
   }
 
   Widget _buildProfileSection() {
-  return Consumer<AuthController>( // 🆕 USAR CONSUMER
-    builder: (context, authController, _) {
-      // 🆕 OBTER NOME DO USUÁRIO DO CONTROLLER
-      final userName = authController.userName ?? "Professor";
-      
-      return Row(
-        children: [
-          const CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage(
-              "https://static.wikia.nocookie.net/dublagem/images/d/d2/Raposo.jpg/revision/latest/thumbnail/width/360/height/360?cb=20240405221148&path-prefix=pt-br",
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                userName, // ✅ AGORA userName ESTÁ DEFINIDO
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                ),
-              ),
-              const Text(
-                "Professor",
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            ],
-          ),
-        ],
-      );
-    },
-  );
-}
+    return Consumer<AuthController>(
+      builder: (context, authController, _) {
+        final userName = authController.userName ?? "Usuário";
+        final userRole = authController.userRole ?? "Professor";
+        final userPhoto = authController.userPhoto;
 
+        return Row(
+          children: [
+            _buildUserAvatar(userName, userPhoto), // ✅ MÉTODO SEPARADO
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  userRole,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildUserAvatar(String userName, String? userPhoto) {
+    if (userPhoto != null && userPhoto.isNotEmpty) {
+      return CircleAvatar(radius: 25, backgroundImage: NetworkImage(userPhoto));
+    } else {
+      // Codificar o nome para URL
+      final encodedName = Uri.encodeComponent(userName);
+      return CircleAvatar(
+        radius: 25,
+        backgroundImage: NetworkImage(
+          "https://ui-avatars.com/api/?name=$encodedName&background=00B4D8&color=fff&size=128",
+        ),
+      );
+    }
+  }
 
   Widget _buildClassroomsList() {
     return Consumer<ClassroomController>(
       builder: (context, controller, _) {
         if (controller.loading) {
           return const Expanded(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: Center(child: CircularProgressIndicator()),
           );
         }
 

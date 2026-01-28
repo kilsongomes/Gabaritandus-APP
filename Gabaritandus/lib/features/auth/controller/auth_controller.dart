@@ -14,6 +14,8 @@ class AuthController extends ChangeNotifier {
   bool _saveInfo = false; // Controlar checkbox
   bool _passwordVisible = false; // Controlar visibilidade da senha
   String? _userName;
+  String? _userRole;
+  String? _userPhoto;
 
   // Getters públicos
   bool get loading => _loading;
@@ -22,12 +24,15 @@ class AuthController extends ChangeNotifier {
   bool get saveInfo => _saveInfo; // Getter para checkbox
   bool get passwordVisible => _passwordVisible; // Getter para visibilidade da senha
   String? get userName => _userName;
+  String? get userRole => _userRole; 
+  String? get userPhoto => _userPhoto; 
 
-  Future<String?> loadUserName() async {
+  Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _userName = prefs.getString("user_name");
+    _userRole = prefs.getString("user_role") ?? "Professor"; 
+    _userPhoto = prefs.getString("user_photo"); 
     notifyListeners();
-    return _userName;
   }
 
   // Método para alternar visibilidade da senha
@@ -95,7 +100,7 @@ class AuthController extends ChangeNotifier {
 
     if (response != null) {
       //Busca os dados salvos no SharedPreferences após login bem-sucedido
-      await loadUserName();
+      await loadUserData();
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString("user");
       final rolesJson = prefs.getString("roles");
@@ -205,6 +210,8 @@ class AuthController extends ChangeNotifier {
     await _authService.logout();
     _user = null;
     _userName = null;
+    _userRole = null; // 🆕 LIMPAR ROLE
+    _userPhoto = null; 
     notifyListeners();
   }
 }

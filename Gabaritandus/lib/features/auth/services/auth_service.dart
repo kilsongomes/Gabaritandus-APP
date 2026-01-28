@@ -31,9 +31,12 @@ class AuthService {
             final token = data["data"]["token"] ?? "";
             final refreshToken = data["data"]["refresh_token"] ?? "";
             final user = data["data"]["user"] ?? {};
-            final userName = user["name"] ?? user["username"] ?? username;
 
-            // 🚨 CORREÇÃO: Pegar as roles do campo correto "user_role"
+            // PEGAR INFORMAÇÕES DO USUÁRIO
+            final userName = user["name"] ?? user["username"] ?? username;
+            final userRole = user["role_name"] ?? "Professor";
+            final userPhoto = user["photo_url"] ?? user["avatar"] ?? ""; 
+
             final userRoles = data["data"]["user_role"] ?? [];
 
             // Extrair apenas as informações das roles que precisamos
@@ -51,6 +54,8 @@ class AuthService {
             await prefs.setString("user", jsonEncode(user));
             await prefs.setString("roles", jsonEncode(roles));
             await prefs.setString("user_name", userName);
+            await prefs.setString("user_role", userRole);
+            await prefs.setString("user_photo", userPhoto);
 
             print("✅ [AuthService] Login bem-sucedido. Token salvo.");
             print("👤 Usuário: $user");
