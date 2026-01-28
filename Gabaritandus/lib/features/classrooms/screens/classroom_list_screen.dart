@@ -12,6 +12,8 @@ class ClassroomListScreen extends StatefulWidget {
 }
 
 class _ClassroomListScreenState extends State<ClassroomListScreen> {
+  final TextEditingController _searchController = TextEditingController(); 
+  final FocusNode _searchFocusNode = FocusNode(); 
   @override
   void initState() {
     super.initState();
@@ -23,6 +25,31 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
       );
       controller.loadUserClassrooms();
     });
+
+      //LISTENER PARA ATUALIZAR FILTRO ENQUANTO DIGITA
+     _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  // MÉTODO PARA ATUALIZAR FILTRO
+  void _onSearchChanged() {
+    final controller = Provider.of<ClassroomController>(context, listen: false);
+    controller.setSearchQuery(_searchController.text);
+  }
+
+  // MÉTODO PARA LIMPAR BUSCA
+  void _clearSearch() {
+    _searchController.clear();
+    final controller = Provider.of<ClassroomController>(context, listen: false);
+    controller.clearSearch();
+    // Manter o foco na busca após limpar
+    _searchFocusNode.requestFocus();
   }
 
   @override
@@ -39,22 +66,76 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
             const SizedBox(height: 16),
 
             // Campo de pesquisa
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Pesquisar",
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
+            _buildSearchField(),
             const SizedBox(height: 16),
+
+            Consumer<ClassroomController>(
+              builder: (context, controller, _) {
+                final total = controller.classrooms.length;
+                final showing = controller.filteredClassrooms.length;
+                final hasSearch = controller.searchQuery.isNotEmpty;
+                
+                if (total == 0) return const SizedBox();
+                
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    hasSearch
+                        ? "Mostrando $showing de $total turmas"
+                        : "Total: $total turmas",
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                );
+              },
+            ),
 
             // Lista de turmas
             _buildClassroomsList(),
           ],
         ),
       ),
+    );
+  }
+
+   Widget _buildSearchField() {
+    return Consumer<ClassroomController>(
+      builder: (context, controller, _) {
+        return TextField(
+          controller: _searchController,
+          focusNode: _searchFocusNode,
+          decoration: InputDecoration(
+            hintText: "Buscar turma ou escola...",
+            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            suffixIcon: controller.searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear, color: Colors.grey),
+                    onPressed: _clearSearch,
+                  )
+                : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.grey),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF00B4D8), width: 2),
+            ),
+            filled: true,
+            fillColor: Colors.grey[50],
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16,
+            ),
+          ),
+          style: const TextStyle(fontSize: 16),
+          onChanged: (value) {
+            // Atualização já feita pelo listener
+          },
+        );
+      },
     );
   }
 
@@ -67,7 +148,7 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
 
         return Row(
           children: [
-            _buildUserAvatar(userName, userPhoto), // ✅ MÉTODO SEPARADO
+            _buildUserAvatar(userName, userPhoto), // MÉTODO SEPARADO
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,9 +191,14 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
   Widget _buildClassroomsList() {
     return Consumer<ClassroomController>(
       builder: (context, controller, _) {
+        // 🆕 USAR filteredClassrooms EM VEZ DE classrooms
+        final classrooms = controller.filteredClassrooms;
+        
         if (controller.loading) {
           return const Expanded(
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
 
@@ -140,12 +226,60 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
           );
         }
 
-        if (controller.classrooms.isEmpty) {
-          return const Expanded(
+        if (classrooms.isEmpty) {
+          return Expanded(
             child: Center(
-              child: Text(
-                "Nenhuma turma encontrada",
-                style: TextStyle(color: Colors.grey),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (controller.searchQuery.isNotEmpty) ...[
+                    const Icon(
+                      Icons.search_off,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Nenhuma turma encontrada",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Não encontramos turmas com '${controller.searchQuery}'",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: _clearSearch,
+                      child: const Text("Limpar busca"),
+                    ),
+                  ] else ...[
+                    const Icon(
+                      Icons.school_outlined,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Nenhuma turma encontrada",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Você não possui turmas atribuídas",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ],
               ),
             ),
           );
@@ -155,9 +289,9 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Cabeçalho tabela
-              Row(
-                children: const [
+              // Cabeçalho tabela (mantido)
+              const Row(
+                children: [
                   Expanded(
                     flex: 2,
                     child: Padding(
@@ -190,13 +324,13 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
               ),
               const Divider(),
 
-              // Lista de turmas
+              // Lista de turmas FILTRADA
               Expanded(
                 child: ListView.separated(
-                  itemCount: controller.classrooms.length,
-                  separatorBuilder: (_, _) => const Divider(),
+                  itemCount: classrooms.length,
+                  separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (context, index) {
-                    final classroom = controller.classrooms[index];
+                    final classroom = classrooms[index];
                     return _buildClassroomItem(classroom);
                   },
                 ),
