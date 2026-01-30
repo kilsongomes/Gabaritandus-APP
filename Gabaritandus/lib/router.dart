@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/classrooms/screens/classroom_list_screen.dart';
 import 'features/classrooms/screens/student_list_screen.dart';
-import '/answer_sheets/screens/capture_screen.dart';
 import 'features/home/presentation/info_screen.dart';
 import 'features/classrooms/controllers/classroom_controller.dart';
 
@@ -39,17 +38,6 @@ class AppRouter {
           ),
         );
 
-      case '/capture':
-        final args = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(
-          builder: (_) => CaptureScreen(
-            studentId: args["studentId"],
-            studentName: args["studentName"],
-            classroomId: args["classroomId"],
-            classroomName: args["classroomName"],
-            discipline: args["discipline"],
-          ),
-        );
 
       default:
         return MaterialPageRoute(
