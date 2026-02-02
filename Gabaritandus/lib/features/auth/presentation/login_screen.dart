@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       case LoginResult.success:
                                         Navigator.pushReplacementNamed(
                                           context,
-                                          "/classrooms",
+                                          "/exams",
                                         );
                                         break;
 
