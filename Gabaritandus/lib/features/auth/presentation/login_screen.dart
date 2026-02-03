@@ -1,3 +1,4 @@
+// login_screen.dart - ADICIONAR TRATAMENTO PARA DESMARCAR CHECKBOX
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/auth_controller.dart';
@@ -12,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
@@ -24,18 +26,24 @@ class _LoginScreenState extends State<LoginScreen> {
   void _loadSavedInfo() async {
     final authController = Provider.of<AuthController>(context, listen: false);
 
-    // Carrega a preferência de salvar informações
+    // 🆕 Carrega a preferência de salvar informações
     await authController.loadSavedLoginInfo();
 
-    // Carrega as credenciais salvas
-    final savedCredentials = await authController.getSavedCredentials();
+    // 🆕 Carrega as credenciais salvas apenas se saveInfo for true
+    if (authController.saveInfo) {
+      final savedCredentials = await authController.getSavedCredentials();
 
-    if (savedCredentials['username'] != null) {
-      usernameController.text = savedCredentials['username']!;
+      if (savedCredentials['username'] != null) {
+        usernameController.text = savedCredentials['username']!;
+      }
+      if (savedCredentials['password'] != null) {
+        passwordController.text = savedCredentials['password']!;
+      }
+      
+      print("🔍 [LoginScreen] Credenciais carregadas: ${savedCredentials['username']}");
     }
-    if (savedCredentials['password'] != null) {
-      passwordController.text = savedCredentials['password']!;
-    }
+    
+    _isFirstLoad = false;
   }
 
   @override
@@ -92,14 +100,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Campo Senha com olho
                         TextField(
                           controller: passwordController,
-                          obscureText: !auth
-                              .passwordVisible, // Controlado pelo controller
+                          obscureText: !auth.passwordVisible,
                           decoration: InputDecoration(
                             labelText: "Senha",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            // Ícone de olho para mostrar/esconder senha
                             suffixIcon: IconButton(
                               icon: Icon(
                                 auth.passwordVisible
@@ -121,7 +127,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             Checkbox(
                               value: auth.saveInfo,
                               onChanged: (value) {
-                                auth.setSaveInfo(value ?? false);
+                                final newValue = value ?? false;
+                                auth.setSaveInfo(newValue);
+                                
+                                // 🆕 Se desmarcar o checkbox E não for primeira carga, limpar campos
+                                if (!newValue && !_isFirstLoad) {
+                                  setState(() {
+                                    usernameController.clear();
+                                    passwordController.clear();
+                                  });
+                                  print("🗑️ [LoginScreen] Checkbox desmarcado, campos limpos");
+                                }
                               },
                             ),
                             const Text("Salvar informações"),
@@ -157,6 +173,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: auth.loading
                                 ? null
                                 : () async {
+                                    print("🔄 [LoginScreen] Tentando login...");
+                                    print("   Usuário: ${usernameController.text}");
+                                    print("   Salvar info: ${auth.saveInfo}");
+                                    
                                     final result = await auth.login(
                                       usernameController.text,
                                       passwordController.text,
@@ -166,6 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                     switch (result) {
                                       case LoginResult.success:
+                                        print("✅ [LoginScreen] Login bem-sucedido, navegando para exames");
                                         Navigator.pushReplacementNamed(
                                           context,
                                           "/exams",
@@ -173,6 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         break;
 
                                       case LoginResult.blockedRole:
+                                        print("🚫 [LoginScreen] Role bloqueada");
                                         Navigator.pushReplacementNamed(
                                           context,
                                           "/info",
@@ -180,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         break;
 
                                       case LoginResult.invalid:
-              
+                                        print("❌ [LoginScreen] Login inválido");
                                         break;
                                     }
                                   },

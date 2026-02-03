@@ -1,4 +1,4 @@
-// exam_controller.dart
+// exam_controller.dart - SIMPLIFICAR
 import 'package:flutter/material.dart';
 import '../services/exam_service.dart';
 
@@ -12,17 +12,6 @@ class ExamController extends ChangeNotifier {
   Map<String, dynamic>? _currentExam;
   List<Map<String, dynamic>> _examStudents = [];
   String _searchQuery = '';
-  int? _teacherGroupId;
-
-  // 🆕 Método para verificar se o controller está inicializado corretamente
-  void debugController() {
-    print("🔍 [ExamController] Debug:");
-    print("   loading: $_loading");
-    print("   error: $_error");
-    print("   exams count: ${_exams.length}");
-    print("   teacherGroupId: $_teacherGroupId");
-    print("   service: ${_service != null ? "OK" : "NULL"}");
-  }
 
   // Getters
   bool get loading => _loading;
@@ -32,15 +21,12 @@ class ExamController extends ChangeNotifier {
   Map<String, dynamic>? get currentExam => _currentExam;
   List<Map<String, dynamic>> get examStudents => _examStudents;
   String get searchQuery => _searchQuery;
-  int? get teacherGroupId => _teacherGroupId;
 
-  // 🆕 Carregar exames do professor (método público simplificado)
   Future<void> loadTeacherExams() async {
     print("🚀 [ExamController] loadTeacherExams() INICIADO");
     
-    // Verificar se já está carregando
     if (_loading) {
-      print("⚠️ [ExamController] Já está carregando, ignorando chamada");
+      print("⚠️ [ExamController] Já está carregando");
       return;
     }
     
@@ -49,37 +35,22 @@ class ExamController extends ChangeNotifier {
     notifyListeners();
     
     try {
-      print("🔄 [ExamController] 1. Buscando group_id do professor...");
+      print("🔄 [ExamController] Buscando exames do professor...");
+      _exams = await _service.getTeacherExams();
       
-      // 🆕 SIMPLIFICAR: Usar group_id fixo para teste primeiro
-      // Depois que funcionar, voltamos a buscar dinamicamente
-      _teacherGroupId = 11; // 🆕 Group ID fixo baseado nos seus logs anteriores
+      print("📊 [ExamController] ${_exams.length} exames recebidos");
       
-      print("🛠️ [ExamController] Usando group_id fixo: $_teacherGroupId");
-      
-      if (_teacherGroupId == null) {
-        _error = "Group ID não encontrado. Você tem turmas atribuídas?";
-        print("❌ [ExamController] Group ID é null");
-        return;
-      }
-      
-      print("🔄 [ExamController] 2. Buscando exames para group_id: $_teacherGroupId");
-      _exams = await _service.getExamsByGroupId(_teacherGroupId!);
-      
-      print("📊 [ExamController] Recebeu ${_exams.length} exames");
-      
-      // Ordenar exames por data
+      // Ordenar por data (mais recente primeiro)
       _sortExamsByDate();
       
       // Inicializar lista filtrada
       _filteredExams = List.from(_exams);
       
-      print("✅ [ExamController] loadTeacherExams() CONCLUÍDO com sucesso");
+      print("✅ [ExamController] Exames carregados com sucesso");
       
     } catch (e) {
       _error = "Erro ao carregar exames: ${e.toString()}";
-      print("❌ [ExamController] Erro em loadTeacherExams(): $e");
-      print("Stack trace: ${e.toString()}");
+      print("❌ [ExamController] Erro: $e");
     } finally {
       _loading = false;
       notifyListeners();
@@ -105,13 +76,7 @@ class ExamController extends ChangeNotifier {
     }
   }
 
-  // 🆕 Carregar detalhes de um exame específico
   Future<void> loadExamDetails(String examId) async {
-    if (examId.isEmpty) {
-      _error = "ID do exame inválido";
-      return;
-    }
-    
     _loading = true;
     _error = null;
     notifyListeners();
@@ -122,18 +87,17 @@ class ExamController extends ChangeNotifier {
       _currentExam = data["exam"] ?? {};
       _examStudents = List<Map<String, dynamic>>.from(data["users"] ?? []);
       
-      print("✅ [ExamController] Detalhes do exame carregados: ${_examStudents.length} alunos");
+      print("✅ [ExamController] Detalhes carregados: ${_examStudents.length} alunos");
       _loading = false;
       notifyListeners();
     } catch (e) {
       _loading = false;
-      _error = "Erro ao carregar detalhes do exame: $e";
+      _error = "Erro ao carregar detalhes: $e";
       print("❌ [ExamController] Erro em loadExamDetails: $e");
       notifyListeners();
     }
   }
 
-  // Ordenar exames por data (mais recente primeiro)
   void _sortExamsByDate() {
     try {
       _exams.sort((a, b) {
@@ -144,7 +108,7 @@ class ExamController extends ChangeNotifier {
         
         final dateA = DateTime.tryParse(dateAStr) ?? DateTime(1900);
         final dateB = DateTime.tryParse(dateBStr) ?? DateTime(1900);
-        return dateB.compareTo(dateA); // Descendente
+        return dateB.compareTo(dateA);
       });
     } catch (e) {
       print("⚠️ [ExamController] Erro ao ordenar exames: $e");
@@ -167,5 +131,4 @@ class ExamController extends ChangeNotifier {
     _filteredExams = List.from(_exams);
     notifyListeners();
   }
-}  // Atualizar busca
-  
+}
