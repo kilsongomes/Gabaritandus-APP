@@ -1,8 +1,8 @@
-// exam_list_screen.dart - ADICIONAR ESTE ARQUIVO
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/exam_controller.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../auth/controller/auth_controller.dart';
 
 class ExamListScreen extends StatefulWidget {
   const ExamListScreen({super.key});
@@ -61,6 +61,9 @@ void initState() {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+             // Seção de perfil do usuário
+            _buildProfileSection(),
+            const SizedBox(height: 20),
             // Campo de pesquisa
             _buildSearchField(),
             const SizedBox(height: 16),
@@ -92,6 +95,93 @@ void initState() {
         ),
       ),
     );
+  }
+
+  // Método para construir a seção de perfil
+  Widget _buildProfileSection() {
+    return Consumer<AuthController>(
+      builder: (context, authController, _) {
+        final userName = authController.userName ?? "Usuário";
+        final userRole = authController.userRole ?? "Professor";
+        final userPhoto = authController.userPhoto; // Pode ser null
+
+        return Row(
+          children: [
+            // Avatar do usuário (com iniciais se não tiver foto)
+            _buildUserAvatar(userName, userPhoto),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  userRole,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildUserAvatar(String userName, String? userPhoto) {
+    if (userPhoto != null && userPhoto.isNotEmpty) {
+      // Se o usuário tem foto, mostrar foto
+      return CircleAvatar(
+        radius: 25,
+        backgroundImage: NetworkImage(userPhoto),
+      );
+    } else {
+      // Se não tem foto, mostrar iniciais com cor de fundo
+      final initials = _getInitials(userName);
+      
+      return CircleAvatar(
+        radius: 25,
+        backgroundColor: const Color(0xFF00B4D8), // Cor azul do app
+        child: Text(
+          initials,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+  }
+
+  // Método para extrair iniciais do nome
+  String _getInitials(String name) {
+    if (name.isEmpty) return "U";
+    
+    final nameParts = name.trim().split(' ');
+    
+    if (nameParts.length == 1) {
+      // Se tem apenas uma palavra, pega as primeiras 2 letras
+      return nameParts[0].length >= 2 
+          ? nameParts[0].substring(0, 2).toUpperCase()
+          : nameParts[0].toUpperCase();
+    } else {
+      // Se tem múltiplas palavras, pega a primeira letra de cada (máx 2)
+      final firstInitial = nameParts[0].isNotEmpty 
+          ? nameParts[0][0].toUpperCase() 
+          : '';
+      
+      final secondInitial = nameParts.length > 1 && nameParts[1].isNotEmpty
+          ? nameParts[1][0].toUpperCase()
+          : '';
+      
+      return '$firstInitial$secondInitial';
+    }
   }
 
   Widget _buildSearchField() {
