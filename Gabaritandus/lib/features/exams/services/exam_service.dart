@@ -106,47 +106,53 @@ class ExamService {
   }
   
   Future<Map<String, dynamic>> getExamDetails(String examId) async {
-    final HttpClient httpClient = HttpClient()
-      ..badCertificateCallback = 
-          ((X509Certificate cert, String host, int port) => true);
+  final HttpClient httpClient = HttpClient()
+    ..badCertificateCallback = 
+        ((X509Certificate cert, String host, int port) => true);
+  
+  try {
+    final token = await _getGroupToken();
     
-    try {
-      final token = await _getGroupToken();
-      
-      if (token == null) {
-        throw Exception("Token não disponível");
-      }
-      
-      final url = Uri.parse("$baseUrl/exam/$examId/users");
-      
-      print("➡️ [ExamService] Buscando detalhes do exame: $examId");
-      
-      final request = await httpClient.getUrl(url);
-      request.headers.set('Content-Type', 'application/json');
-      request.headers.set('Authorization', 'Bearer $token');
-      
-      final response = await request.close();
-      final responseBody = await response.transform(utf8.decoder).join();
-      
-      print("⬅️ [ExamService] Status: ${response.statusCode}");
-      
-      if (response.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-        
-        if (data is Map && data["message"] == "Users successfully listed") {
-          print("✅ [ExamService] Detalhes do exame carregados");
-          return data["data"];
-        } else {
-          throw Exception(data["message"] ?? "Erro ao buscar detalhes do exame");
-        }
-      } else {
-        throw Exception("Erro HTTP ${response.statusCode}: $responseBody");
-      }
-    } catch (e) {
-      print("❌ [ExamService] Erro ao buscar detalhes do exame: $e");
-      rethrow;
-    } finally {
-      httpClient.close();
+    if (token == null) {
+      throw Exception("Token não disponível");
     }
+    
+    // CORREÇÃO: Usar o endpoint correto que você me mostrou
+    final url = Uri.parse(
+      "$baseUrl/user/list-users-by-exam-schedules/$examId?pageSize=100&groupId=11&page=0&regionId=14&schoolId=7558",
+    );
+    
+    print("➡️ [ExamService] Buscando detalhes do exame: $examId");
+    print("URL: $url");
+    
+    final request = await httpClient.getUrl(url);
+    request.headers.set('Content-Type', 'application/json');
+    request.headers.set('Authorization', 'Bearer $token');
+    
+    final response = await request.close();
+    final responseBody = await response.transform(utf8.decoder).join();
+    
+    print("⬅️ [ExamService] Status: ${response.statusCode}");
+    
+    if (response.statusCode == 200) {
+      final data = jsonDecode(responseBody);
+      
+      if (data is Map && data["message"] == "Users successfully listed") {
+        print("✅ [ExamService] Detalhes do exame carregados");
+        print("   Número de usuários: ${data["data"]["users"].length}");
+        print("   Nome do exame: ${data["data"]["exam"]["name"]}");
+        return data["data"];
+      } else {
+        throw Exception(data["message"] ?? "Erro ao buscar detalhes do exame");
+      }
+    } else {
+      throw Exception("Erro HTTP ${response.statusCode}: $responseBody");
+    }
+  } catch (e) {
+    print("❌ [ExamService] Erro ao buscar detalhes do exame: $e");
+    rethrow;
+  } finally {
+    httpClient.close();
   }
+}
 }
