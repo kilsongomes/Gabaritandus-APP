@@ -20,6 +20,20 @@ class ExamService {
     return groupId;
   }
 
+  Future<int?> _getRegionId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final regionId = prefs.getInt("region_id");
+    print("🔍 [ExamService] Region ID: $regionId");
+    return regionId;
+  }
+
+  Future<int?> _getSchoolId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final schoolId = prefs.getInt("school_id");
+    print("🔍 [ExamService] School ID: $schoolId");
+    return schoolId;
+  }
+
   Future<String?> _getGroupToken() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("group_token");
@@ -118,18 +132,34 @@ class ExamService {
 
     try {
       final token = await _getGroupToken();
+      final groupId = await _getGroupId();
+      final regionId = await _getRegionId();
+      final schoolId = await _getSchoolId();
 
       if (token == null) {
         throw Exception("Token não disponível");
       }
 
-      // CORREÇÃO: Usar o endpoint correto que você me mostrou
-      final url = Uri.parse(
-        "$baseUrl/user/list-users-by-exam-schedules/$examId?pageSize=100&groupId=11&page=0&regionId=14&schoolId=7558",
-      );
+      if (groupId == null) {
+        throw Exception("Group ID não disponível");
+      }
 
+      if (regionId == null) {
+        print("⚠️ [ExamService] Region ID não disponível, usando fallback 14");
+      }
+      
+      if (schoolId == null) {
+        print("⚠️ [ExamService] School ID não disponível, usando fallback 7558");
+      } 
+
+      // 
+      final url = Uri.parse(
+        "$baseUrl/user/list-users-by-exam-schedules/$examId?pageSize=100&groupId=$groupId&page=0&regionId=${regionId ?? 14}&schoolId=${schoolId ?? 7558}",
+      );
+      
       print("➡️ [ExamService] Buscando detalhes do exame: $examId");
       print("URL: $url");
+      print("Group ID usado: $groupId");
 
       final request = await httpClient.getUrl(url);
       request.headers.set('Content-Type', 'application/json');

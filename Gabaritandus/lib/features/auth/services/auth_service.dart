@@ -145,6 +145,8 @@ class AuthService {
       final groupId = group["id"] ?? 0;
       final groupName = group["name"] ?? "";
       final groupToken = group["token"] ?? "";
+      final regionId = region["id"] ?? 0;
+      final schoolId = school["id"] ?? 0;
       
       print("💾 [AuthService] Salvando dados do usuário:");
       print("   👤 Nome: $userName");
@@ -152,6 +154,8 @@ class AuthService {
       print("   🏢 Grupo: $groupName (ID: $groupId)");
       print("   🔐 Token do grupo: ${groupToken.isNotEmpty ? "SIM" : "NÃO"}");
       print("   🏫 Escola: ${school["name"]}");
+      print("   🏫 Escola: ${school["name"]} (ID: $schoolId)"); // 🔥 Adicionado ID
+      print("   🗺️ Região: ${region["name"]} (ID: $regionId)");
       print("   📚 Turmas: ${rooms.length}");
       
       // Salvar no SharedPreferences
@@ -163,7 +167,9 @@ class AuthService {
       await prefs.setString("group_name", groupName);
       await prefs.setString("group_token", groupToken);
       await prefs.setString("region_name", region["name"] ?? "");
+      await prefs.setInt("region_id", regionId);
       await prefs.setString("school_name", school["name"] ?? "");
+      await prefs.setInt("school_id", schoolId);
       
       print("✅ [AuthService] Dados salvos com sucesso");
       
