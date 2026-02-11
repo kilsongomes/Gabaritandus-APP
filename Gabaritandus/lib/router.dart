@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/home/presentation/info_screen.dart';
 
-// 🆕 Import das novas telas de exames
+// Import das novas telas de exames
 import 'features/exams/screens/exam_list_screen.dart';
 import 'features/exams/screens/exam_students_screen.dart';
 import 'features/exams/controller/exam_controller.dart';
@@ -45,7 +45,7 @@ class AppRouter {
           ),
         );
 
-      // 🆕 (OPCIONAL) Rota para captura de gabarito
+      // Rota para captura de gabarito
       case '/capture-answer-sheet':
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(

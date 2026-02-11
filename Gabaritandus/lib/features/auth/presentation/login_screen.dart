@@ -26,10 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _loadSavedInfo() async {
     final authController = Provider.of<AuthController>(context, listen: false);
 
-    // 🆕 Carrega a preferência de salvar informações
+    // Carrega a preferência de salvar informações
     await authController.loadSavedLoginInfo();
 
-    // 🆕 Carrega as credenciais salvas apenas se saveInfo for true
+    // Carrega as credenciais salvas apenas se saveInfo for true
     if (authController.saveInfo) {
       final savedCredentials = await authController.getSavedCredentials();
 
@@ -88,6 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Campo Username
                         TextField(
                           controller: usernameController,
+                          autocorrect: false,
+                          enableSuggestions: false,
                           decoration: InputDecoration(
                             labelText: "Usuário",
                             border: OutlineInputBorder(
@@ -130,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 final newValue = value ?? false;
                                 auth.setSaveInfo(newValue);
                                 
-                                // 🆕 Se desmarcar o checkbox E não for primeira carga, limpar campos
+                                // Se desmarcar o checkbox E não for primeira carga, limpar campos
                                 if (!newValue && !_isFirstLoad) {
                                   setState(() {
                                     usernameController.clear();

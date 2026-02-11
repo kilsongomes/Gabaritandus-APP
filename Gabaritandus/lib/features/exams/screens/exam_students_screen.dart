@@ -76,7 +76,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     });
   }
 
-  // 🆕 Método para formatar duração
+  // Método para formatar duração
   String _formatDuration(int? seconds) {
     if (seconds == null) return "Não informada";
     
@@ -90,7 +90,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     }
   }
 
-  // 🆕 Método para formatar data
+  // Método para formatar data
   String _formatDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) return "Não informada";
     
@@ -431,7 +431,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     final studentId = user["id"];
     final hasApplication = applications.isNotEmpty;
     
-    // 🆕 Determinar status baseado nas applications e results
+    // Determinar status baseado nas applications e results
     String status = "Não iniciou";
     Color statusColor = Colors.grey;
     IconData statusIcon = Icons.pending;
@@ -588,7 +588,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     );
   }
 
-  // 🆕 Método para mostrar opções de captura
+  //  Método para mostrar opções de captura
   void _showCaptureOptions(BuildContext context, String studentName, dynamic studentId) {
     showModalBottomSheet(
       context: context,

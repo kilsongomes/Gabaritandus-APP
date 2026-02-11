@@ -104,7 +104,7 @@ class AuthService {
       final request = await _httpClient.getUrl(Uri.parse(userInfoUrl));
       request.headers.set('Content-Type', 'application/json');
       
-      // 🆕 Adicionar cookies à requisição
+      // Adicionar cookies à requisição
       _addCookiesToRequest(request);
       
       final response = await request.close();
