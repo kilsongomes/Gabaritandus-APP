@@ -496,6 +496,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     Icon(statusIcon, color: statusColor, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
+                    child: Tooltip(
+                      message: studentName, // Mostra nome completo ao segurar
                       child: Text(
                         studentName,
                         style: const TextStyle(
@@ -506,6 +508,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                         maxLines: 1,
                       ),
                     ),
+                  ),
                   ],
                 ),
                 const SizedBox(height: 4),

@@ -99,18 +99,21 @@ void initState() {
 
   // Método para construir a seção de perfil
   Widget _buildProfileSection() {
-    return Consumer<AuthController>(
-      builder: (context, authController, _) {
-        final userName = authController.userName ?? "Usuário";
-        final userRole = authController.userRole ?? "Professor";
-        final userPhoto = authController.userPhoto; // Pode ser null
+  return Consumer<AuthController>(
+    builder: (context, authController, _) {
+      final userName = authController.userName ?? "Usuário";
+      final userRole = authController.userRole ?? "Professor";
+      final userPhoto = authController.userPhoto;
 
-        return Row(
-          children: [
-            // Avatar do usuário (com iniciais se não tiver foto)
-            _buildUserAvatar(userName, userPhoto),
-            const SizedBox(width: 12),
-            Column(
+      return Row(
+        children: [
+          // Avatar do usuário (fixo)
+          _buildUserAvatar(userName, userPhoto),
+          const SizedBox(width: 12),
+          
+          // 🔥 CORREÇÃO: Expanded para o texto não vazar
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -119,19 +122,24 @@ void initState() {
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
+                  maxLines: 2, // Permite até 2 linhas
+                  overflow: TextOverflow.ellipsis, // Adiciona ... se necessário
                 ),
                 const SizedBox(height: 2),
                 Text(
                   userRole,
                   style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-          ],
-        );
-      },
-    );
-  }
+          ),
+        ],
+      );
+    },
+  );
+}
 
   Widget _buildUserAvatar(String userName, String? userPhoto) {
     if (userPhoto != null && userPhoto.isNotEmpty) {
