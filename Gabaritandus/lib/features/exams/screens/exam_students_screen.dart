@@ -518,14 +518,18 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (studentEmail.isNotEmpty)
-                        Text(
+                        Tooltip(
+                        message: studentEmail,
+                        child: Text(
                           studentEmail,
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
                           ),
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
+                      ),
                       if (tryCount > 0)
                         Text(
                           "Tentativas: $tryCount${lastAttemptDate.isNotEmpty ? ' • Última: $lastAttemptDate' : ''}",
