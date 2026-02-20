@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/exam_controller.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
-
+import '../../answer_sheet/screens/capture_answer_sheet_screen.dart';
 class ExamStudentsScreen extends StatefulWidget {
   final String examId;
   final String examName;
@@ -646,9 +646,20 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
-                    _captureFromCamera(studentName, studentId);
-                  },
+                  Navigator.pop(context);
+                  // 🔥 ATUALIZADO: Navegar para tela de captura
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CaptureAnswerSheetScreen(
+                        studentName: studentName,
+                        examName: widget.examName,
+                        studentId: studentId,
+                        examId: widget.examId,
+                      ),
+                    ),
+                  );
+                },
                 ),
               ),
               
@@ -672,9 +683,20 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
-                    _pickFromGallery(studentName, studentId);
-                  },
+                  Navigator.pop(context);
+                  // 🔥 ATUALIZADO: Navegar para tela de captura
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CaptureAnswerSheetScreen(
+                        studentName: studentName,
+                        examName: widget.examName,
+                        studentId: studentId,
+                        examId: widget.examId,
+                      ),
+                    ),
+                  );
+                },
                 ),
               ),
               
