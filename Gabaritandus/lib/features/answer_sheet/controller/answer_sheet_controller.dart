@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gabaritandus/features/answer_sheet/services/answer_sheet_reader.dart';

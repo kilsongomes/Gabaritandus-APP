@@ -33,74 +33,78 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           backgroundColor: const Color(0xFF00B4D8),
           foregroundColor: Colors.white,
         ),
-        body: Consumer<AnswerSheetController>(
-          builder: (context, controller, _) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Informações do aluno/exame
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Aluno",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+        body: SafeArea( // 🔥 CORREÇÃO: Envolver com SafeArea
+          child: Consumer<AnswerSheetController>(
+            builder: (context, controller, _) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Informações do aluno/exame
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Aluno",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                          Text(
-                            widget.studentName,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              widget.studentName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            "Exame",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                            const SizedBox(height: 8),
+                            const Text(
+                              "Exame",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                          Text(
-                            widget.examName,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
+                            Text(
+                              widget.examName,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Área da imagem/preview
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[300]!),
+                    
+                    const SizedBox(height: 20),
+                    
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: _buildImagePreview(controller),
                       ),
-                      child: _buildImagePreview(controller),
                     ),
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Botões de ação
-                  _buildActionButtons(controller),
-                ],
-              ),
-            );
-          },
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Botões de ação - SEMPRE VISÍVEIS
+                    _buildActionButtons(controller),
+                    
+                    // 🔥 ADICIONADO: Espaçamento extra para garantir que não fique atrás dos botões
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -185,6 +189,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
+                  runSpacing: 8, // 🔥 ADICIONADO: espaçamento entre linhas
                   children: controller.extractedAnswers!.asMap().entries.map((entry) {
                     final index = entry.key + 1;
                     final answer = entry.value ?? "?";

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../controller/exam_controller.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../answer_sheet/screens/capture_answer_sheet_screen.dart';
+
 class ExamStudentsScreen extends StatefulWidget {
   final String examId;
   final String examName;
@@ -32,7 +33,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
       final controller = Provider.of<ExamController>(context, listen: false);
       controller.loadExamDetails(widget.examId);
     });
-    
+
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -53,7 +54,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   void _filterStudents() {
     final controller = Provider.of<ExamController>(context, listen: false);
     final students = controller.examStudents;
-    
+
     if (_searchQuery.isEmpty) {
       _filteredStudents = List.from(students);
     } else {
@@ -61,9 +62,9 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         final user = studentData["user"] ?? {};
         final studentName = (user["name"] ?? "").toString().toLowerCase();
         final studentEmail = (user["email"] ?? "").toString().toLowerCase();
-        
-        return studentName.contains(_searchQuery) || 
-               studentEmail.contains(_searchQuery);
+
+        return studentName.contains(_searchQuery) ||
+            studentEmail.contains(_searchQuery);
       }).toList();
     }
   }
@@ -79,10 +80,10 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   // Método para formatar duração
   String _formatDuration(int? seconds) {
     if (seconds == null) return "Não informada";
-    
+
     final hours = seconds ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
-    
+
     if (hours > 0) {
       return "$hours h ${minutes.toString().padLeft(2, '0')} min";
     } else {
@@ -93,7 +94,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   // Método para formatar data
   String _formatDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) return "Não informada";
-    
+
     try {
       final date = DateTime.parse(dateString);
       return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
@@ -105,10 +106,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: widget.examName,
-        showBackButton: true,
-      ),
+      appBar: CustomAppBar(title: widget.examName, showBackButton: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -121,7 +119,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 if (exam == null || controller.loading) {
                   return const SizedBox();
                 }
-                
+
                 return Card(
                   elevation: 2,
                   shape: RoundedRectangleBorder(
@@ -155,7 +153,11 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.school, size: 16, color: Colors.grey[600]),
+                            Icon(
+                              Icons.school,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -168,7 +170,11 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.question_answer, size: 16, color: Colors.grey[600]),
+                            Icon(
+                              Icons.question_answer,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -181,7 +187,11 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.timer, size: 16, color: Colors.grey[600]),
+                            Icon(
+                              Icons.timer,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -197,22 +207,24 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 );
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Campo de busca
             _buildSearchField(),
-            
+
             const SizedBox(height: 16),
-            
+
             // Contador de alunos
             Consumer<ExamController>(
               builder: (context, controller, _) {
                 final total = controller.examStudents.length;
-                final showing = _searchQuery.isEmpty ? total : _filteredStudents.length;
-                
+                final showing = _searchQuery.isEmpty
+                    ? total
+                    : _filteredStudents.length;
+
                 if (total == 0 && !controller.loading) return const SizedBox();
-                
+
                 if (controller.loading) {
                   return const Padding(
                     padding: EdgeInsets.only(bottom: 8),
@@ -222,7 +234,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     ),
                   );
                 }
-                
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
@@ -234,7 +246,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 );
               },
             ),
-            
+
             // Cabeçalho da lista
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -258,7 +270,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
               ],
             ),
             const Divider(),
-            
+
             // Lista de alunos
             Expanded(child: _buildStudentsList()),
           ],
@@ -290,7 +302,10 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         ),
         filled: true,
         fillColor: Colors.grey[50],
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: 16,
+        ),
       ),
       style: const TextStyle(fontSize: 16),
     );
@@ -355,10 +370,10 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
           );
         }
 
-        final students = _searchQuery.isEmpty 
-            ? controller.examStudents 
+        final students = _searchQuery.isEmpty
+            ? controller.examStudents
             : _filteredStudents;
-        
+
         if (students.isEmpty) {
           return Center(
             child: Column(
@@ -387,7 +402,11 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     child: const Text("Limpar busca"),
                   ),
                 ] else ...[
-                  const Icon(Icons.people_outline, size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.people_outline,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     "Nenhum aluno encontrado",
@@ -423,14 +442,18 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
 
   Widget _buildStudentItem(Map<String, dynamic> studentData) {
     final user = studentData["user"] ?? {};
-    final applications = List<Map<String, dynamic>>.from(studentData["applications"] ?? []);
-    final results = List<Map<String, dynamic>>.from(studentData["results"] ?? []);
-    
+    final applications = List<Map<String, dynamic>>.from(
+      studentData["applications"] ?? [],
+    );
+    final results = List<Map<String, dynamic>>.from(
+      studentData["results"] ?? [],
+    );
+
     final studentName = user["name"] ?? "Aluno sem nome";
     final studentEmail = user["email"] ?? "";
     final studentId = user["id"];
     final hasApplication = applications.isNotEmpty;
-    
+
     // Determinar status baseado nas applications e results
     String status = "Não iniciou";
     Color statusColor = Colors.grey;
@@ -438,23 +461,25 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     String scoreText = "";
     int tryCount = 0;
     String lastAttemptDate = "";
-    
+
     if (hasApplication) {
       // Ordenar por try_number (maior primeiro)
-      applications.sort((a, b) => (b["try_number"] ?? 0).compareTo(a["try_number"] ?? 0));
+      applications.sort(
+        (a, b) => (b["try_number"] ?? 0).compareTo(a["try_number"] ?? 0),
+      );
       final lastApplication = applications.first;
-      
+
       tryCount = applications.length;
       lastAttemptDate = _formatDate(lastApplication["app_start"]?.toString());
-      
+
       final appEnd = lastApplication["app_end"];
-      
+
       if (appEnd != null) {
         // Exame foi finalizado
         status = "Concluído";
         statusColor = Colors.green;
         statusIcon = Icons.check_circle;
-        
+
         // Verificar se tem resultado
         if (results.isNotEmpty) {
           // Encontrar o resultado correspondente à última application
@@ -462,7 +487,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
             (result) => result["application_id"] == lastApplication["id"],
             orElse: () => {},
           );
-          
+
           if (lastResult.isNotEmpty) {
             final score = lastResult["score"] ?? 0;
             scoreText = "Nota: $score";
@@ -496,19 +521,19 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     Icon(statusIcon, color: statusColor, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
-                    child: Tooltip(
-                      message: studentName, // Mostra nome completo ao segurar
-                      child: Text(
-                        studentName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      child: Tooltip(
+                        message: studentName, // Mostra nome completo ao segurar
+                        child: Text(
+                          studentName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
                     ),
-                  ),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -519,17 +544,17 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     children: [
                       if (studentEmail.isNotEmpty)
                         Tooltip(
-                        message: studentEmail,
-                        child: Text(
-                          studentEmail,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
+                          message: studentEmail,
+                          child: Text(
+                            studentEmail,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
                         ),
-                      ),
                       if (tryCount > 0)
                         Text(
                           "Tentativas: $tryCount${lastAttemptDate.isNotEmpty ? ' • Última: $lastAttemptDate' : ''}",
@@ -553,7 +578,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
               ],
             ),
           ),
-          
+
           // Status
           Expanded(
             flex: 1,
@@ -578,7 +603,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
               ),
             ),
           ),
-          
+
           // Botão para capturar gabarito
           IconButton(
             icon: Icon(
@@ -596,120 +621,124 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   }
 
   //  Método para mostrar opções de captura
-  void _showCaptureOptions(BuildContext context, String studentName, dynamic studentId) {
+  void _showCaptureOptions(
+    BuildContext context,
+    String studentName,
+    dynamic studentId,
+  ) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Capturar gabarito",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                studentName,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              
-              // Opção 1: Tirar foto
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.camera_alt, size: 24),
-                  label: const Text(
-                    "Tirar foto do gabarito",
-                    style: TextStyle(fontSize: 16),
+        return SafeArea(
+          child: Container(
+            padding: EdgeInsets.only(
+              top: 20,
+              left: 20,
+              right: 20,
+              bottom: MediaQuery.of(context).padding.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Capturar gabarito",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00B4D8),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  studentName,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+
+                // Opção 1: Tirar foto
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.camera_alt, size: 24),
+                    label: const Text(
+                      "Tirar foto do gabarito",
+                      style: TextStyle(fontSize: 16),
                     ),
-                  ),
-                  onPressed: () {
-                  Navigator.pop(context);
-                  // 🔥 ATUALIZADO: Navegar para tela de captura
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CaptureAnswerSheetScreen(
-                        studentName: studentName,
-                        examName: widget.examName,
-                        studentId: studentId,
-                        examId: widget.examId,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00B4D8),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  );
-                },
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // 🔥 ATUALIZADO: Navegar para tela de captura
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CaptureAnswerSheetScreen(
+                            studentName: studentName,
+                            examName: widget.examName,
+                            studentId: studentId,
+                            examId: widget.examId,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Opção 2: Escolher da galeria
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.photo_library, size: 24),
-                  label: const Text(
-                    "Escolher da galeria",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF00B4D8),
-                    side: const BorderSide(color: Color(0xFF00B4D8)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+
+                const SizedBox(height: 12),
+
+                // Opção 2: Escolher da galeria
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.photo_library, size: 24),
+                    label: const Text(
+                      "Escolher da galeria",
+                      style: TextStyle(fontSize: 16),
                     ),
-                  ),
-                  onPressed: () {
-                  Navigator.pop(context);
-                  // 🔥 ATUALIZADO: Navegar para tela de captura
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CaptureAnswerSheetScreen(
-                        studentName: studentName,
-                        examName: widget.examName,
-                        studentId: studentId,
-                        examId: widget.examId,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF00B4D8),
+                      side: const BorderSide(color: Color(0xFF00B4D8)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  );
-                },
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // 🔥 ATUALIZADO: Navegar para tela de captura
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CaptureAnswerSheetScreen(
+                            studentName: studentName,
+                            examName: widget.examName,
+                            studentId: studentId,
+                            examId: widget.examId,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  "Cancelar",
-                  style: TextStyle(fontSize: 16),
+
+                const SizedBox(height: 16),
+
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancelar", style: TextStyle(fontSize: 16)),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -724,7 +753,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         duration: const Duration(seconds: 2),
       ),
     );
-    
+
     // Para implementar, você precisará adicionar:
     // 1. Dependência: image_picker: ^1.0.4
     // 2. Permissões de câmera no AndroidManifest.xml e Info.plist
@@ -743,7 +772,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         duration: const Duration(seconds: 2),
       ),
     );
-    
+
     // Para implementar, você precisará adicionar:
     // 1. Dependência: image_picker: ^1.0.4
     // 2. Código como:
