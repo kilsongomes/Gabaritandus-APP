@@ -1,11 +1,12 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/answer_sheet_reader.dart';
+import 'package:gabaritandus/features/answer_sheet/services/answer_sheet_reader.dart';
 
 class AnswerSheetController extends ChangeNotifier {
-  final AnswerSheetReader _reader = AnswerSheetReader();
+  final AnswerSheetProcessor _reader = AnswerSheetProcessor();
   final ImagePicker _imagePicker = ImagePicker();
   
   bool _isProcessing = false;
@@ -79,14 +80,11 @@ class AnswerSheetController extends ChangeNotifier {
     try {
       print("⚙️ [AnswerSheetController] Processando imagem...");
       
-      // Carregar imagem
-      final Uint8List bytes = await image.readAsBytes();
-      final ui.Codec codec = await ui.instantiateImageCodec(bytes);
-      final ui.FrameInfo frame = await codec.getNextFrame();
-      final ui.Image uiImage = frame.image;
+      // Converter XFile para File
+      final File imageFile = File(image.path);
       
       // Processar com o reader
-      _extractedAnswers = await _reader.processAnswerSheet(uiImage);
+      _extractedAnswers = await _reader.processAnswerSheet(imageFile);
       
       print("✅ [AnswerSheetController] Processamento concluído");
       print("   Respostas detectadas: $_extractedAnswers");
