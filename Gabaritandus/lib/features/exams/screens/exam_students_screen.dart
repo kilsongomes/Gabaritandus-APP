@@ -103,6 +103,20 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     }
   }
 
+  void _navigateToCaptureScreen(String studentName, dynamic studentId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CaptureAnswerSheetScreen(
+          studentName: studentName,
+          examName: widget.examName,
+          studentId: studentId,
+          examId: widget.examId,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -612,173 +626,11 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
               size: 24,
             ),
             onPressed: () {
-              _showCaptureOptions(context, studentName, studentId);
+              _navigateToCaptureScreen(studentName, studentId);
             },
           ),
         ],
       ),
     );
-  }
-
-  //  Método para mostrar opções de captura
-  void _showCaptureOptions(
-    BuildContext context,
-    String studentName,
-    dynamic studentId,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Container(
-            padding: EdgeInsets.only(
-              top: 20,
-              left: 20,
-              right: 20,
-              bottom: MediaQuery.of(context).padding.bottom,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Capturar gabarito",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  studentName,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-
-                // Opção 1: Tirar foto
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.camera_alt, size: 24),
-                    label: const Text(
-                      "Tirar foto do gabarito",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00B4D8),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // 🔥 ATUALIZADO: Navegar para tela de captura
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CaptureAnswerSheetScreen(
-                            studentName: studentName,
-                            examName: widget.examName,
-                            studentId: studentId,
-                            examId: widget.examId,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Opção 2: Escolher da galeria
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.photo_library, size: 24),
-                    label: const Text(
-                      "Escolher da galeria",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF00B4D8),
-                      side: const BorderSide(color: Color(0xFF00B4D8)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // 🔥 ATUALIZADO: Navegar para tela de captura
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CaptureAnswerSheetScreen(
-                            studentName: studentName,
-                            examName: widget.examName,
-                            studentId: studentId,
-                            examId: widget.examId,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancelar", style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _captureFromCamera(String studentName, dynamic studentId) {
-    // TODO: Implementar captura de foto com câmera
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Abrir câmera para capturar gabarito de $studentName"),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-
-    // Para implementar, você precisará adicionar:
-    // 1. Dependência: image_picker: ^1.0.4
-    // 2. Permissões de câmera no AndroidManifest.xml e Info.plist
-    // 3. Código como:
-    //    final image = await ImagePicker().pickImage(source: ImageSource.camera);
-    //    if (image != null) {
-    //      // Processar imagem
-    //    }
-  }
-
-  void _pickFromGallery(String studentName, dynamic studentId) {
-    // TODO: Implementar seleção da galeria
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Abrir galeria para selecionar gabarito de $studentName"),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-
-    // Para implementar, você precisará adicionar:
-    // 1. Dependência: image_picker: ^1.0.4
-    // 2. Código como:
-    //    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    //    if (image != null) {
-    //      // Processar imagem
-    //    }
   }
 }
