@@ -45,10 +45,15 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                   children: [
                     // Informações do aluno/exame
                     Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: EdgeInsets.all(0),    
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Text(
                               "Aluno",
@@ -180,15 +185,42 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
-                  runSpacing: 8, 
+                  runSpacing: 8,
                   children: controller.extractedAnswers!.asMap().entries.map((
                     entry,
                   ) {
-                    final index = entry.key + 1;
-                    final answer = entry.value ?? "?";
+                    final index = entry.key;
+                    final answer = entry.value;
+                    final isEdited = controller.editedQuestions[index];
+
+                    // Cor baseada em edição
+                    Color chipColor;
+                    if (isEdited) {
+                      chipColor = Colors.orange[100]!; // Laranja se editado
+                    } else if (answer != null) {
+                      chipColor = Colors.green[100]!; // Verde se detectado
+                    } else {
+                      chipColor = Colors.grey[200]!; // Cinza se não detectado
+                    }
+
                     return Chip(
-                      label: Text("$index: $answer"),
-                      backgroundColor: Colors.green[100],
+                      label: answer == null
+                          ? const SizedBox(
+                              width: 30, // Largura fixa igual aos outros chips
+                              child: Center(
+                                child: Icon(
+                                  Icons.crop_square,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
+                          : Text("${index + 1}: $answer"),
+                      backgroundColor: chipColor,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ), // Padding uniforme
                     );
                   }).toList(),
                 ),
@@ -196,8 +228,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          
-          // 🔥 NOVO: Row com 3 botões
+
           Row(
             children: [
               // Botão Nova Captura
@@ -205,12 +236,14 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 child: OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: const Text("Nova Captura"),
-                  onPressed: controller.clear,
+                  onPressed: () {
+                    controller.resetEditedFlags(); // Resetar flags
+                    controller.clear();
+                  },
                 ),
               ),
               const SizedBox(width: 8),
-              
-              // 🔥 NOVO: Botão Editar
+
               Expanded(
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.edit),
@@ -227,8 +260,8 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                           studentName: widget.studentName,
                           examName: widget.examName,
                           answers: controller.extractedAnswers!,
+                          editedQuestions: controller.editedQuestions,
                           onAnswersUpdated: (updatedAnswers) {
-                            // Atualizar as respostas no controller
                             controller.updateExtractedAnswers(updatedAnswers);
                           },
                         ),
@@ -238,7 +271,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              
+
               // Botão Confirmar
               Expanded(
                 child: ElevatedButton.icon(

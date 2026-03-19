@@ -28,6 +28,9 @@ class AnswerSheetController extends ChangeNotifier {
   dynamic get currentStudentId => _currentStudentId;
   String? get currentExamId => _currentExamId;
 
+  List<bool> _editedQuestions = List.filled(10, false);
+  List<bool> get editedQuestions => _editedQuestions;
+
   Future<void> captureWithOverlay(
     BuildContext context, {
     required String studentName,
@@ -146,20 +149,33 @@ class AnswerSheetController extends ChangeNotifier {
     }
   }
 
-  // Método para atualizar as respostas após edição
   void updateExtractedAnswers(List<String?> updatedAnswers) {
+    // Identificar quais questões foram editadas
+    for (int i = 0; i < updatedAnswers.length; i++) {
+      if (_extractedAnswers != null && 
+          i < _extractedAnswers!.length && 
+          _extractedAnswers![i] != updatedAnswers[i]) {
+        _editedQuestions[i] = true;
+      }
+    }
+    
     _extractedAnswers = updatedAnswers;
     notifyListeners();
-    print(
-      "✏️ [AnswerSheetController] Respostas atualizadas: $_extractedAnswers",
-    );
+    print("✏️ [AnswerSheetController] Respostas atualizadas: $_extractedAnswers");
+    print("✏️ Questões editadas: $_editedQuestions");
   }
-
-  /// Limpar os dados
+  
+  // Resetar flags de edição (quando fizer nova captura)
+  void resetEditedFlags() {
+    _editedQuestions = List.filled(10, false);
+  }
+  
+  // Modificar o método clear para também resetar as flags
   void clear() {
     _capturedImage = null;
     _extractedAnswers = null;
     _error = null;
+    _editedQuestions = List.filled(10, false); // Resetar flags
     notifyListeners();
-  }
+  }  
 }

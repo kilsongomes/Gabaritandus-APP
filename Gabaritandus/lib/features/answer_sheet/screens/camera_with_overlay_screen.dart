@@ -23,9 +23,8 @@ class CameraWithOverlayScreen extends StatefulWidget {
 class _CameraWithOverlayScreenState extends State<CameraWithOverlayScreen> {
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
-  bool _isTorchOn = false;
   
-  static const double a4AspectRatio = 297 / 210; // ~1.414
+
 
   @override
   void initState() {
@@ -71,16 +70,6 @@ class _CameraWithOverlayScreenState extends State<CameraWithOverlayScreen> {
     }
   }
 
-  void _toggleTorch() {
-    if (_cameraController != null && _cameraController!.value.isInitialized) {
-      setState(() {
-        _isTorchOn = !_isTorchOn;
-      });
-      _cameraController!.setFlashMode(
-        _isTorchOn ? FlashMode.torch : FlashMode.off,
-      );
-    }
-  }
 
   @override
   void dispose() {

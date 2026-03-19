@@ -5,6 +5,7 @@ class EditAnswersScreen extends StatefulWidget {
   final String studentName;
   final String examName;
   final List<String?> answers;
+  final List<bool> editedQuestions;
   final Function(List<String?>) onAnswersUpdated;
 
   const EditAnswersScreen({
@@ -12,6 +13,7 @@ class EditAnswersScreen extends StatefulWidget {
     required this.studentName,
     required this.examName,
     required this.answers,
+    required this.editedQuestions,
     required this.onAnswersUpdated,
   });
 
@@ -21,6 +23,7 @@ class EditAnswersScreen extends StatefulWidget {
 
 class _EditAnswersScreenState extends State<EditAnswersScreen> {
   late List<String?> _editedAnswers;
+    late List<bool> _locallyEdited;
   static const List<String> options = ['A', 'B', 'C', 'D'];
 
   @override
@@ -28,6 +31,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
     super.initState();
     // Copiar as respostas para edição
     _editedAnswers = List.from(widget.answers);
+    _locallyEdited = List.from(widget.editedQuestions);
   }
 
   @override
@@ -111,6 +115,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
               itemBuilder: (context, index) {
                 final questionNumber = index + 1;
                 final selectedOption = _editedAnswers[index];
+                final wasEdited = _locallyEdited[index]; // 🔥 NOVO
                 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -119,13 +124,39 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Número da questão
-                        Text(
-                          "Questão $questionNumber",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        // Número da questão com indicador de edição
+                        Row(
+                          children: [
+                            Text(
+                              "Questão $questionNumber",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: wasEdited ? Colors.orange : Colors.black,
+                              ),
+                            ),
+                            if (wasEdited) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  "Editada",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 12),
                         
@@ -144,6 +175,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                   } else {
                                     _editedAnswers[index] = option;
                                   }
+                                  _locallyEdited[index] = true;
                                 });
                               },
                               child: Container(
