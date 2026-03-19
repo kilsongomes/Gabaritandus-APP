@@ -56,7 +56,7 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: "Meus Exames", showBackButton: true),
+      appBar: const CustomAppBar(title: "Avaliações", showBackButton: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -343,7 +343,7 @@ void initState() {
     switch (status) {
       case "active":
         statusColor = Colors.green;
-        statusIcon = Icons.play_circle_filled;
+        statusIcon = Icons.description;
         break;
       case "finished":
         statusColor = Colors.blue;
