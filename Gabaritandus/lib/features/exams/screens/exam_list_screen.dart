@@ -56,7 +56,7 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: "Avaliações", showBackButton: true),
+      appBar: const CustomAppBar(title: "Avaliações", showBackButton: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -81,15 +81,15 @@ void initState() {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
                     hasSearch
-                        ? "Mostrando $showing de $total exames"
-                        : "Total: $total exames",
+                        ? "Mostrando $showing de $total Avaliações"
+                        : "Total: $total Avaliações",
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                 );
               },
             ),
 
-            // Lista de exames
+            // Lista de Avaliações
             Expanded(child: _buildExamsList()),
           ],
         ),
@@ -111,7 +111,7 @@ void initState() {
           _buildUserAvatar(userName, userPhoto),
           const SizedBox(width: 12),
           
-          // 🔥 CORREÇÃO: Expanded para o texto não vazar
+          // Expanded para o texto não vazar
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,7 +199,7 @@ void initState() {
           controller: _searchController,
           focusNode: _searchFocusNode,
           decoration: InputDecoration(
-            hintText: "Buscar exame por nome ou disciplina...",
+            hintText: "Buscar avaliações por nome ou disciplina...",
             prefixIcon: const Icon(Icons.search, color: Colors.grey),
             suffixIcon: controller.searchQuery.isNotEmpty
                 ? IconButton(
@@ -275,7 +275,7 @@ void initState() {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Não encontramos exames com '${controller.searchQuery}'",
+                    "Não encontramos Avaliações com '${controller.searchQuery}'",
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.grey),
                   ),
@@ -297,7 +297,7 @@ void initState() {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    "Você não possui exames cadastrados",
+                    "Você não possui Avaliações cadastradas",
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -323,18 +323,7 @@ void initState() {
     final discipline = exam["discipline_name"] ?? "Disciplina não informada";
     final grade = exam["grade_name"] ?? "Ano não informado";
     final status = exam["status"] ?? "unknown";
-    final createdAt = exam["createdAt"];
-
-    // Formatar data
-    String formattedDate = "Data não informada";
-    if (createdAt != null) {
-      try {
-        final date = DateTime.parse(createdAt);
-        formattedDate = "${date.day}/${date.month}/${date.year}";
-      } catch (e) {
-        formattedDate = createdAt.toString();
-      }
-    }
+    
 
     // Cor do status
     Color statusColor = Colors.grey;
@@ -349,17 +338,17 @@ void initState() {
 
         break;
       case "finished":
-        statusColor = Colors.blue;
-        statusIcon = Icons.check_circle;
+        statusColor = Color(0xFF00B4D8);
+        statusIcon = Icons.description;
         statusText = "Finalizada";
         break;
       case "pending":
-        statusColor = Colors.blue;
-        statusIcon = Icons.schedule;
+        statusColor = Colors.orange;
+        statusIcon = Icons.description;
         statusText = "Em andamento";
         break;
       default:
-        statusColor = Colors.blue;
+        statusColor = Colors.grey;
         statusIcon = Icons.help_outline;
         statusText = "Desconecido";
     }
@@ -377,13 +366,8 @@ void initState() {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 4),
-            Text("$discipline • $grade",
+            Text("$discipline - $grade",
             textAlign: TextAlign.center,),
-            Text(
-              "Criado: $formattedDate",
-              style: const TextStyle(fontSize: 12),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(height: 4),
             Center(
               child: Container(
