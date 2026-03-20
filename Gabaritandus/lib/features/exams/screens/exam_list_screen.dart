@@ -339,23 +339,29 @@ void initState() {
     // Cor do status
     Color statusColor = Colors.grey;
     IconData statusIcon = Icons.help_outline;
+    String statusText = "Desconecido";
 
     switch (status) {
       case "active":
         statusColor = Colors.green;
         statusIcon = Icons.description;
+        statusText = "Disponível";
+
         break;
       case "finished":
         statusColor = Colors.blue;
         statusIcon = Icons.check_circle;
+        statusText = "Finalizada";
         break;
       case "pending":
-        statusColor = Colors.orange;
+        statusColor = Colors.blue;
         statusIcon = Icons.schedule;
+        statusText = "Em andamento";
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = Colors.blue;
         statusIcon = Icons.help_outline;
+        statusText = "Desconecido";
     }
 
     return Card(
@@ -365,30 +371,35 @@ void initState() {
         title: Text(
           examName,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          textAlign: TextAlign.center,
         ),
         subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 4),
-            Text("$discipline • $grade"),
+            Text("$discipline • $grade",
+            textAlign: TextAlign.center,),
             Text(
               "Criado: $formattedDate",
               style: const TextStyle(fontSize: 12),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: statusColor),
-              ),
-              child: Text(
-                status.toUpperCase(),
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: statusColor),
+                ),
+                child: Text(
+                  statusText,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
