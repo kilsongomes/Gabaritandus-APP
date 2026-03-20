@@ -5,7 +5,6 @@ import '../../features/auth/controller/auth_controller.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showBackButton;
-  final bool showNotifications;
   final bool showMenu;
   final List<Widget>? actions;
 
@@ -13,7 +12,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.title = "Gabaritandus",
     this.showBackButton = false,
-    this.showNotifications = true,
     this.showMenu = true,
     this.actions,
   });
@@ -57,21 +55,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   List<Widget> _buildDefaultActions(BuildContext context) {
     final List<Widget> defaultActions = [];
-
-    // Ícone de notificações
-    if (showNotifications) {
-      defaultActions.add(
-        IconButton(
-          icon: const Icon(Icons.notifications_none, color: Colors.black87),
-          onPressed: () {
-            // Futuramente: abrir notificações
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Notificações em desenvolvimento")),
-            );
-          },
-        ),
-      );
-    }
 
     // Menu de opções (logout)
     if (showMenu) {
