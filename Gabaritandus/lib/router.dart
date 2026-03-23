@@ -34,6 +34,7 @@ class AppRouter {
               examId: args["examId"],
               examName: args["examName"],
               groupId: args["groupId"],
+              examGrade: args["examGrade"] ?? "Ano não informado",
             ),
           ),
         );
@@ -47,6 +48,7 @@ class AppRouter {
             examName: args["examName"],
             studentId: args["studentId"],
             examId: args["examId"],
+            examGrade: args["examGrade"] ?? "Ano não informado",
           ),
         );
 

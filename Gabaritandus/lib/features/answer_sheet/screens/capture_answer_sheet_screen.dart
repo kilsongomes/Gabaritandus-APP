@@ -10,6 +10,7 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
   final String examName;
   final dynamic studentId;
   final String examId;
+  final String examGrade;
 
   const CaptureAnswerSheetScreen({
     super.key,
@@ -17,6 +18,7 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
     required this.examName,
     required this.studentId,
     required this.examId,
+    required this.examGrade,
   });
 
   @override
@@ -31,7 +33,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       create: (_) => AnswerSheetController(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Capturar Gabarito"),
+          title: const Text("Capturar gabarito"),
           backgroundColor: const Color(0xFF00B4D8),
           foregroundColor: Colors.white,
         ),
@@ -49,17 +51,18 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      margin: EdgeInsets.all(0),    
+                      margin: EdgeInsets.all(0),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Text(
-                              "Aluno",
+                              "Estudante",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
@@ -71,15 +74,22 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                             ),
                             const SizedBox(height: 8),
                             const Text(
-                              "Exame",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
+                              "",
+                              style: TextStyle(fontSize: 3, color: Colors.grey),
                             ),
                             Text(
                               widget.examName,
-                              style: const TextStyle(fontSize: 16),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              widget.examGrade,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -122,9 +132,23 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(
+              width: 100,
+              height: 100,
+              child: Image(
+                image: AssetImage('assets/images/processing.gif'),
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(height: 16),
             CircularProgressIndicator(),
             SizedBox(height: 16),
             Text("Processando imagem..."),
+            SizedBox(height: 8),
+            Text(
+              "Analisando respostas...",
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
       );
@@ -148,13 +172,14 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           const SizedBox(height: 16),
           Text(
             "Nenhuma imagem capturada",
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.grey[600],),
           ),
           const SizedBox(height: 8),
           Text(
-            "Use os botões abaixo para capturar ou\nselecionar uma imagem",
+            "Use o botão abaixo para \ncapturar uma imagem",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            style: TextStyle(fontSize: 14, color: Colors.grey[500],fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -292,13 +317,16 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       );
     }
 
-    // Botões de captura (quando não há imagem)
+    // Botão de captura
     return Row(
       children: [
         Expanded(
           child: ElevatedButton.icon(
-            icon: const Icon(Icons.camera_alt),
-            label: const Text("Tirar Foto"),
+            icon: const Icon(Icons.camera_alt, color: Colors.white,size: 30,),
+            label: const Text(
+              "Tirar foto",
+              style: TextStyle(color: Colors.white, fontSize: 18,),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF00B4D8),
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -312,21 +340,6 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     studentId: widget.studentId,
                     examId: widget.examId,
                   ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.photo_library),
-            label: const Text("Galeria"),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF00B4D8),
-              side: const BorderSide(color: Color(0xFF00B4D8)),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            onPressed: controller.isProcessing
-                ? null
-                : () => controller.pickFromGallery(),
           ),
         ),
       ],

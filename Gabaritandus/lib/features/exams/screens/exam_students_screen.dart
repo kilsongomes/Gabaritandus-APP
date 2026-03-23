@@ -8,12 +8,14 @@ class ExamStudentsScreen extends StatefulWidget {
   final String examId;
   final String examName;
   final int groupId;
+  final String examGrade;
 
   const ExamStudentsScreen({
     super.key,
     required this.examId,
     required this.examName,
     required this.groupId,
+    required this.examGrade,
   });
 
   @override
@@ -112,6 +114,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
           examName: widget.examName,
           studentId: studentId,
           examId: widget.examId,
+          examGrade: widget.examGrade,
         ),
       ),
     );
