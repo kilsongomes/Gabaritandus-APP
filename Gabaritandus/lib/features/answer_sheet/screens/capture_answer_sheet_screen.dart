@@ -34,7 +34,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Capturar gabarito"),
-          backgroundColor: const Color(0xFF00B4D8),
+          backgroundColor: const Color(0xff004aad),
           foregroundColor: Colors.white,
         ),
         body: SafeArea(
@@ -328,7 +328,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
               style: TextStyle(color: Colors.white, fontSize: 18,),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00B4D8),
+              backgroundColor: const Color(0xff004aad),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             onPressed: controller.isProcessing

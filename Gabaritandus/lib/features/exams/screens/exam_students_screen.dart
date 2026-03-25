@@ -315,7 +315,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF00B4D8), width: 2),
+          borderSide: const BorderSide(color: Color(0xff004aad), width: 2),
         ),
         filled: true,
         fillColor: Colors.grey[50],
@@ -375,7 +375,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 ElevatedButton(
                   onPressed: () => controller.loadExamDetails(widget.examId),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00B4D8),
+                    backgroundColor: const Color(0xff004aad),
                   ),
                   child: const Text(
                     "Tentar Novamente",
@@ -625,7 +625,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
           IconButton(
             icon: Icon(
               hasApplication ? Icons.camera_alt : Icons.camera_alt_outlined,
-              color: hasApplication ? const Color(0xFF00B4D8) : Colors.grey,
+              color: hasApplication ? const Color(0xff004aad) : Colors.grey,
               size: 24,
             ),
             onPressed: () {

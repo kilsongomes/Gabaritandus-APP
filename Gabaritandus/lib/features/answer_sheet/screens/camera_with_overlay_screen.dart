@@ -106,7 +106,7 @@ class _CameraWithOverlayScreenState extends State<CameraWithOverlayScreen> {
       floatingActionButton: _isCameraInitialized
           ? FloatingActionButton(
               onPressed: _takePicture,
-              backgroundColor: const Color(0xFF00B4D8),
+              backgroundColor: const Color(0xff004aad),
               child: const Icon(Icons.camera),
             )
           : null,

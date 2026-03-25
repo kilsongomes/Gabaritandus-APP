@@ -39,7 +39,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Editar Respostas"),
-        backgroundColor: const Color(0xFF00B4D8),
+        backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
         actions: [
           // Botão Salvar

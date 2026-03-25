@@ -154,7 +154,7 @@ void initState() {
       
       return CircleAvatar(
         radius: 25,
-        backgroundColor: const Color(0xFF00B4D8), // Cor azul do app
+        backgroundColor: const Color(0xff004aad), // Cor azul do app
         child: Text(
           initials,
           style: const TextStyle(
@@ -213,7 +213,7 @@ void initState() {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF00B4D8), width: 2),
+              borderSide: const BorderSide(color: Color(0xff004aad), width: 2),
             ),
             filled: true,
             fillColor: Colors.grey[50],
@@ -338,7 +338,7 @@ void initState() {
 
         break;
       case "finished":
-        statusColor = Color(0xFF00B4D8);
+        statusColor = Color(0xff004aad);
         statusIcon = Icons.description;
         statusText = "Finalizada";
         break;
@@ -389,7 +389,7 @@ void initState() {
             ),
           ],
         ),
-        trailing: const Icon(Icons.chevron_right, color: Color(0xFF00B4D8)),
+        trailing: const Icon(Icons.chevron_right, color: Color(0xff004aad)),
         onTap: () {
           Navigator.pushNamed(
             context,
