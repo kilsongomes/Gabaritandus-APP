@@ -399,6 +399,7 @@ void initState() {
               "examName": examName,
               "groupId": exam["group_id"] ?? 0,
               "examGrade": grade,
+              "disciplineName": discipline,
             },
           );
         },

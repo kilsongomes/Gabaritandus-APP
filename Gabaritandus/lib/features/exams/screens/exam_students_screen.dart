@@ -9,6 +9,7 @@ class ExamStudentsScreen extends StatefulWidget {
   final String examName;
   final int groupId;
   final String examGrade;
+  final String disciplineName;
 
   const ExamStudentsScreen({
     super.key,
@@ -16,6 +17,7 @@ class ExamStudentsScreen extends StatefulWidget {
     required this.examName,
     required this.groupId,
     required this.examGrade,
+    required this.disciplineName,
   });
 
   @override
@@ -79,32 +81,6 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     });
   }
 
-  // Método para formatar duração
-  String _formatDuration(int? seconds) {
-    if (seconds == null) return "Não informada";
-
-    final hours = seconds ~/ 3600;
-    final minutes = (seconds % 3600) ~/ 60;
-
-    if (hours > 0) {
-      return "$hours h ${minutes.toString().padLeft(2, '0')} min";
-    } else {
-      return "$minutes min";
-    }
-  }
-
-  // Método para formatar data
-  String _formatDate(String? dateString) {
-    if (dateString == null || dateString.isEmpty) return "Não informada";
-
-    try {
-      final date = DateTime.parse(dateString);
-      return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
-    } catch (e) {
-      return dateString;
-    }
-  }
-
   void _navigateToCaptureScreen(String studentName, dynamic studentId) {
     Navigator.push(
       context,
@@ -123,7 +99,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: widget.examName, showBackButton: true),
+      appBar: CustomAppBar(title: widget.disciplineName, showBackButton: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -153,71 +129,32 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
-                        const SizedBox(height: 8),
+                        ),                      
+                        const SizedBox(height: 4),
                         Row(
-                          children: [
-                            Icon(Icons.book, size: 16, color: Colors.grey[600]),
+                          children: [                            
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                "Disciplina: ${exam["discipline_name"] ?? "Não informada"}",
-                                style: TextStyle(color: Colors.grey[600]),
+                                "${exam["grade_name"] ?? "Não informado"}",
+                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Row(
-                          children: [
-                            Icon(
-                              Icons.school,
-                              size: 16,
-                              color: Colors.grey[600],
-                            ),
+                          children: [                            
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                "Ano: ${exam["grade_name"] ?? "Não informado"}",
-                                style: TextStyle(color: Colors.grey[600]),
+                                "${(exam["questions"] as List?)?.length ?? 0} questões",
+                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.question_answer,
-                              size: 16,
-                              color: Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                "Questões: ${(exam["questions"] as List?)?.length ?? 0}",
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.timer,
-                              size: 16,
-                              color: Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                "Duração: ${_formatDuration(exam["duration_in_seconds"])}",
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ),
-                          ],
-                        ),
+                        const SizedBox(height: 4),                        
                       ],
                     ),
                   ),
@@ -232,7 +169,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
 
             const SizedBox(height: 16),
 
-            // Contador de alunos
+            // Contador de estudantes
             Consumer<ExamController>(
               builder: (context, controller, _) {
                 final total = controller.examStudents.length;
@@ -246,7 +183,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   return const Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: Text(
-                      "Carregando alunos...",
+                      "Carregando estudantes...",
                       style: TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                   );
@@ -256,8 +193,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
                     _searchQuery.isEmpty
-                        ? "Total: $total aluno${total != 1 ? 's' : ''}"
-                        : "Mostrando $showing de $total aluno${total != 1 ? 's' : ''}",
+                        ? "Total: $total estudante${total != 1 ? 's' : ''}"
+                        : "Mostrando $showing de $total estudante${total != 1 ? 's' : ''}",
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                 );
@@ -271,7 +208,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 Expanded(
                   flex: 3,
                   child: Text(
-                    "ALUNO",
+                    "Estudante",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
@@ -288,7 +225,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
             ),
             const Divider(),
 
-            // Lista de alunos
+            // Lista de estudantes
             Expanded(child: _buildStudentsList()),
           ],
         ),
@@ -301,7 +238,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
       controller: _searchController,
       focusNode: _searchFocusNode,
       decoration: InputDecoration(
-        hintText: "Buscar aluno por nome...",
+        hintText: "Pesquise por estudante",
         prefixIcon: const Icon(Icons.search, color: Colors.grey),
         suffixIcon: _searchQuery.isNotEmpty
             ? IconButton(
@@ -339,7 +276,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 CircularProgressIndicator(),
                 SizedBox(height: 16),
                 Text(
-                  "Carregando alunos...",
+                  "Carregando estudantes...",
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
@@ -355,7 +292,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 const Icon(Icons.error_outline, size: 64, color: Colors.red),
                 const SizedBox(height: 16),
                 Text(
-                  "Erro ao carregar alunos",
+                  "Erro ao carregar estudantes",
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -400,7 +337,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   const Icon(Icons.search_off, size: 64, color: Colors.grey),
                   const SizedBox(height: 16),
                   const Text(
-                    "Nenhum aluno encontrado",
+                    "Nenhum estudante encontrado",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -409,7 +346,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Não encontramos alunos com '$_searchQuery'",
+                    "Não encontramos estudantes com '$_searchQuery'",
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.grey),
                   ),
@@ -426,7 +363,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    "Nenhum aluno encontrado",
+                    "Nenhum estudante encontrado",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -435,7 +372,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    "Este exame não tem alunos atribuídos",
+                    "Este exame não tem estudantes atribuídos",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -466,18 +403,17 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
       studentData["results"] ?? [],
     );
 
-    final studentName = user["name"] ?? "Aluno sem nome";
-    final studentEmail = user["email"] ?? "";
+    final studentName = user["name"] ?? "Estudante sem nome";
     final studentId = user["id"];
     final hasApplication = applications.isNotEmpty;
+    final studentUsername = user["username"] ?? "";
 
     // Determinar status baseado nas applications e results
     String status = "Não iniciou";
     Color statusColor = Colors.grey;
     IconData statusIcon = Icons.pending;
     String scoreText = "";
-    int tryCount = 0;
-    String lastAttemptDate = "";
+    
 
     if (hasApplication) {
       // Ordenar por try_number (maior primeiro)
@@ -486,8 +422,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
       );
       final lastApplication = applications.first;
 
-      tryCount = applications.length;
-      lastAttemptDate = _formatDate(lastApplication["app_start"]?.toString());
+     
+     
 
       final appEnd = lastApplication["app_end"];
 
@@ -527,7 +463,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Informações do aluno
+          // Informações do estudante
           Expanded(
             flex: 3,
             child: Column(
@@ -559,11 +495,11 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (studentEmail.isNotEmpty)
+                      if (studentUsername.isNotEmpty)
                         Tooltip(
-                          message: studentEmail,
+                          message: studentUsername,
                           child: Text(
-                            studentEmail,
+                            "$studentUsername",
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -571,15 +507,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
-                        ),
-                      if (tryCount > 0)
-                        Text(
-                          "Tentativas: $tryCount${lastAttemptDate.isNotEmpty ? ' • Última: $lastAttemptDate' : ''}",
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey,
-                          ),
-                        ),
+                        ),                      
+                      
                       if (scoreText.isNotEmpty)
                         Text(
                           scoreText,
