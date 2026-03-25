@@ -129,32 +129,38 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),                      
+                        ),
                         const SizedBox(height: 4),
                         Row(
-                          children: [                            
+                          children: [
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 "${exam["grade_name"] ?? "Não informado"}",
-                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Row(
-                          children: [                            
+                          children: [
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 "${(exam["questions"] as List?)?.length ?? 0} questões",
-                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),                        
+                        const SizedBox(height: 4),
                       ],
                     ),
                   ),
@@ -215,12 +221,19 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    "STATUS",
+                    "Status",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(width: 48), // Espaço para o botão de upload
+                SizedBox(
+                  width: 48,
+                  child: Text(
+                    "Ação",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ],
             ),
             const Divider(),
@@ -411,9 +424,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     // Determinar status baseado nas applications e results
     String status = "Não iniciou";
     Color statusColor = Colors.grey;
-    IconData statusIcon = Icons.pending;
+
     String scoreText = "";
-    
 
     if (hasApplication) {
       // Ordenar por try_number (maior primeiro)
@@ -422,16 +434,12 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
       );
       final lastApplication = applications.first;
 
-     
-     
-
       final appEnd = lastApplication["app_end"];
 
       if (appEnd != null) {
         // Exame foi finalizado
         status = "Concluído";
         statusColor = Colors.green;
-        statusIcon = Icons.check_circle;
 
         // Verificar se tem resultado
         if (results.isNotEmpty) {
@@ -446,14 +454,12 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
             scoreText = "Nota: $score";
             status = "Corrigido";
             statusColor = Colors.blue;
-            statusIcon = Icons.grade;
           }
         }
       } else {
         // Exame em andamento
         status = "Em andamento";
         statusColor = Colors.orange;
-        statusIcon = Icons.timer;
       }
     }
 
@@ -471,7 +477,6 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(statusIcon, color: statusColor, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Tooltip(
@@ -491,7 +496,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Padding(
-                  padding: const EdgeInsets.only(left: 26),
+                  padding: const EdgeInsets.only(left: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -507,8 +512,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
-                        ),                      
-                      
+                        ),
+
                       if (scoreText.isNotEmpty)
                         Text(
                           scoreText,
@@ -540,7 +545,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                   status,
                   style: TextStyle(
                     color: statusColor,
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -552,11 +557,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
 
           // Botão para capturar gabarito
           IconButton(
-            icon: Icon(
-              hasApplication ? Icons.camera_alt : Icons.camera_alt_outlined,
-              color: hasApplication ? const Color(0xff004aad) : Colors.grey,
-              size: 24,
-            ),
+            icon: Icon(Icons.camera_alt_outlined, color: Colors.grey, size: 24,),
             onPressed: () {
               _navigateToCaptureScreen(studentName, studentId);
             },
