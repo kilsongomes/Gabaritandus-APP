@@ -17,6 +17,7 @@ class AnswerSheetController extends ChangeNotifier {
   String? _currentExamName;
   dynamic _currentStudentId;
   String? _currentExamId;
+  int? _currentNumberOfQuestions;
 
   bool get isProcessing => _isProcessing;
   String? get error => _error;
@@ -27,6 +28,7 @@ class AnswerSheetController extends ChangeNotifier {
   String? get currentExamName => _currentExamName;
   dynamic get currentStudentId => _currentStudentId;
   String? get currentExamId => _currentExamId;
+  int? get currentNumberOfQuestions => _currentNumberOfQuestions;
 
   List<bool> _editedQuestions = List.filled(10, false);
   List<bool> get editedQuestions => _editedQuestions;
@@ -37,12 +39,14 @@ class AnswerSheetController extends ChangeNotifier {
     required String examName,
     required dynamic studentId,
     required String examId,
+    required int numberOfQuestions,
   }) async {
     // Salvar informações do contexto atual
     _currentStudentName = studentName;
     _currentExamName = examName;
     _currentStudentId = studentId;
     _currentExamId = examId;
+    _currentNumberOfQuestions = numberOfQuestions;
 
     try {
       print("📷 [AnswerSheetController] Abrindo câmera com overlay...");
@@ -56,6 +60,7 @@ class AnswerSheetController extends ChangeNotifier {
             examName: examName,
             studentId: studentId,
             examId: examId,
+            numberOfQuestions: numberOfQuestions
           ),
         ),
       );
@@ -136,7 +141,18 @@ class AnswerSheetController extends ChangeNotifier {
       final File imageFile = File(image.path);
 
       // Processar com o reader
-      _extractedAnswers = await _reader.processAnswerSheet(imageFile);
+      // Processar com o reader, passando o número de questões
+      if (_currentNumberOfQuestions == null) {
+        throw Exception("Número de questões não definido");
+      }
+
+      _extractedAnswers = await _reader.processAnswerSheet(
+        imageFile,
+        _currentNumberOfQuestions!,
+      );
+
+      // Ajustar a lista de questões editadas para o número correto
+      _editedQuestions = List.filled(_extractedAnswers!.length, false);
 
       print("✅ [AnswerSheetController] Processamento concluído");
       print("   Respostas detectadas: $_extractedAnswers");
@@ -152,30 +168,32 @@ class AnswerSheetController extends ChangeNotifier {
   void updateExtractedAnswers(List<String?> updatedAnswers) {
     // Identificar quais questões foram editadas
     for (int i = 0; i < updatedAnswers.length; i++) {
-      if (_extractedAnswers != null && 
-          i < _extractedAnswers!.length && 
+      if (_extractedAnswers != null &&
+          i < _extractedAnswers!.length &&
           _extractedAnswers![i] != updatedAnswers[i]) {
         _editedQuestions[i] = true;
       }
     }
-    
+
     _extractedAnswers = updatedAnswers;
     notifyListeners();
-    print("✏️ [AnswerSheetController] Respostas atualizadas: $_extractedAnswers");
+    print(
+      "✏️ [AnswerSheetController] Respostas atualizadas: $_extractedAnswers",
+    );
     print("✏️ Questões editadas: $_editedQuestions");
   }
-  
+
   // Resetar flags de edição (quando fizer nova captura)
   void resetEditedFlags() {
     _editedQuestions = List.filled(10, false);
   }
-  
-  // Modificar o método clear para também resetar as flags
+
+  // método clear para também resetar as flags
   void clear() {
     _capturedImage = null;
     _extractedAnswers = null;
     _error = null;
     _editedQuestions = List.filled(10, false); // Resetar flags
     notifyListeners();
-  }  
+  }
 }

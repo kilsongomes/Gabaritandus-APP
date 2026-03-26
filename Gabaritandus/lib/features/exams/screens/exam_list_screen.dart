@@ -400,6 +400,7 @@ void initState() {
               "groupId": exam["group_id"] ?? 0,
               "examGrade": grade,
               "disciplineName": discipline,
+              "numberOfQuestions": exam["number_of_questions"] ?? 10,
             },
           );
         },

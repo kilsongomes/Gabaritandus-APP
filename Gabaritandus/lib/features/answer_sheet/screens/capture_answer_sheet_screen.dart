@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/answer_sheet_controller.dart';
-import 'edit_answers_screen.dart'; // Nova importação
+import 'edit_answers_screen.dart'; 
+import '../services/answer_sheet_api_service.dart';
+import '../controller/api_config.dart';
 
 class CaptureAnswerSheetScreen extends StatefulWidget {
   final String studentName;
@@ -11,6 +13,7 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
   final dynamic studentId;
   final String examId;
   final String examGrade;
+  final int numberOfQuestions;
 
   const CaptureAnswerSheetScreen({
     super.key,
@@ -19,6 +22,7 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
     required this.studentId,
     required this.examId,
     required this.examGrade,
+    required this.numberOfQuestions
   });
 
   @override
@@ -27,6 +31,41 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
 }
 
 class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Testar conexão com a API ao abrir a tela
+    _testApiConnection();
+  }
+  
+  Future<void> _testApiConnection() async {
+    final apiService = AnswerSheetApiService();
+    final isConnected = await apiService.testConnection();
+    
+    if (!isConnected && mounted) {
+      // Mostrar aviso se não conseguir conectar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Não foi possível conectar à API em ${ApiConfig.baseUrl}',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('API conectada com sucesso!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -339,6 +378,8 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     examName: widget.examName,
                     studentId: widget.studentId,
                     examId: widget.examId,
+                    numberOfQuestions: widget.numberOfQuestions
+
                   ),
           ),
         ),
@@ -346,25 +387,69 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     );
   }
 
-  void _confirmAnswers(List<String?> answers) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Sucesso!"),
-        content: Text(
-          "Gabarito de ${widget.studentName} capturado com sucesso.\n"
-          "Respostas: ${answers.where((a) => a != null).length} de 10 detectadas",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Fecha dialog
-              Navigator.pop(context); // Volta para tela anterior
-            },
-            child: const Text("OK"),
+  // Add this method to confirm answers and send to your backend if needed
+void _confirmAnswers(List<String?> answers) async {
+  // Show loading dialog
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  try {
+    // Here you can send the answers to your backend if needed
+    // For example:
+    // final apiService = AnswerSheetApiService();
+    // await apiService.saveAnswers(widget.studentId, widget.examId, answers);
+    
+    // Close loading dialog
+    if (context.mounted) {
+      Navigator.pop(context);
+      
+      // Show success dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Sucesso!"),
+          content: Text(
+            "Gabarito de ${widget.studentName} capturado com sucesso.\n"
+            "Respostas: ${answers.where((a) => a != null).length} de ${answers.length} detectadas\n\n"
+            "Respostas: ${answers.map((a) => a ?? '?').join(', ')}",
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Fecha dialog
+                Navigator.pop(context); // Volta para tela anterior
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    }
+  } catch (e) {
+    // Close loading dialog
+    if (context.mounted) {
+      Navigator.pop(context);
+      
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Erro"),
+          content: Text("Erro ao salvar respostas: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    }
   }
+}
 }

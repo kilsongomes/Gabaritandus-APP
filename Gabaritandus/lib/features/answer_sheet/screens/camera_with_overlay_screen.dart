@@ -7,6 +7,7 @@ class CameraWithOverlayScreen extends StatefulWidget {
   final String examName;
   final dynamic studentId;
   final String examId;
+  final int numberOfQuestions;
 
   const CameraWithOverlayScreen({
     super.key,
@@ -14,6 +15,8 @@ class CameraWithOverlayScreen extends StatefulWidget {
     required this.examName,
     required this.studentId,
     required this.examId,
+    required this.numberOfQuestions,
+
   });
 
   @override

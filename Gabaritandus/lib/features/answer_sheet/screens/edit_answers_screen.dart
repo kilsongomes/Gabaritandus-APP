@@ -115,7 +115,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
               itemBuilder: (context, index) {
                 final questionNumber = index + 1;
                 final selectedOption = _editedAnswers[index];
-                final wasEdited = _locallyEdited[index]; // 🔥 NOVO
+                final wasEdited = _locallyEdited[index]; 
                 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
