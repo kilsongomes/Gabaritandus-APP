@@ -23,7 +23,7 @@ class EditAnswersScreen extends StatefulWidget {
 
 class _EditAnswersScreenState extends State<EditAnswersScreen> {
   late List<String?> _editedAnswers;
-    late List<bool> _locallyEdited;
+  late List<bool> _locallyEdited;
   static const List<String> options = ['A', 'B', 'C', 'D'];
 
   @override
@@ -71,36 +71,16 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                       Text(
                         widget.studentName,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         widget.examName,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "${_editedAnswers.where((a) => a != null).length} de 10",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ),
               ],
@@ -111,12 +91,12 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: 10, // 10 questões
+              itemCount: _editedAnswers.length,
               itemBuilder: (context, index) {
                 final questionNumber = index + 1;
                 final selectedOption = _editedAnswers[index];
-                final wasEdited = _locallyEdited[index]; 
-                
+                final wasEdited = _locallyEdited[index];
+
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: Padding(
@@ -159,54 +139,155 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        
-                        // Opções A, B, C, D como bolinhas
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: options.map((option) {
-                            final isSelected = selectedOption == option;
-                            
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  // Se clicar na mesma opção, desmarca
-                                  if (isSelected) {
-                                    _editedAnswers[index] = null;
-                                  } else {
-                                    _editedAnswers[index] = option;
-                                  }
-                                  _locallyEdited[index] = true;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
+
+                        // Opções A, B, C, D e botões Branco/Rasura
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              ...options.map((option) {
+                                final isSelected = selectedOption == option;
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      // Se clicar na mesma opção, desmarca
+                                      if (isSelected) {
+                                        _editedAnswers[index] = null;
+                                      } else {
+                                        _editedAnswers[index] = option;
+                                      }
+                                      _locallyEdited[index] = true;
+                                    });
+                                  },
+                                  child: Container(
+                                    width: 60,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        // Bolinha
+                                        Container(
+                                          width: 50,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: isSelected
+                                                ? Colors.grey[600]
+                                                : Colors.grey[200],
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? Colors.grey[600]!
+                                                  : Colors.grey[400]!,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              option,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: isSelected
+                                                    ? Colors.white
+                                                    : Colors.grey[600],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+
+                              // Botões Branco e Rasura (um acima do outro)
+                              Container(
+                                width: 60,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
                                 child: Column(
                                   children: [
-                                    // Bolinha
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: isSelected
-                                            ? Colors.green
-                                            : Colors.grey[200],
-                                        border: Border.all(
-                                          color: isSelected
-                                              ? Colors.green
-                                              : Colors.grey[400]!,
-                                          width: 2,
+                                    // Botão Branco (texto "Branco")
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (selectedOption == "Branco") {
+                                            _editedAnswers[index] = null;
+                                          } else {
+                                            _editedAnswers[index] = "Branco";
+                                          }
+                                          _locallyEdited[index] = true;
+                                        });
+                                      },
+                                      child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: selectedOption == "Branco"
+                                              ? Colors.grey[600]
+                                              : Colors.white,
+                                          border: Border.all(
+                                            color: selectedOption == "Branco"
+                                                ? Colors.grey[600]!
+                                                : Colors.grey[400]!,
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            "Branco",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          option,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: isSelected
-                                                ? Colors.white
-                                                : Colors.grey[600],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Botão Rasura (texto "Rasura")
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (selectedOption == "Rasura") {
+                                            _editedAnswers[index] = null;
+                                          } else {
+                                            _editedAnswers[index] = "Rasura";
+                                          }
+                                          _locallyEdited[index] = true;
+                                        });
+                                      },
+                                      child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: selectedOption == "Rasura"
+                                              ? Colors.grey
+                                              : Colors.white,
+                                          border: Border.all(
+                                            color: selectedOption == "Rasura"
+                                                ? Colors.grey[600]!
+                                                : Colors.grey[400]!,
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            "Rasura",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -214,8 +295,8 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                   ],
                                 ),
                               ),
-                            );
-                          }).toList(),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -232,9 +313,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
   void _saveChanges() {
     // Chamar o callback com as respostas editadas
     widget.onAnswersUpdated(_editedAnswers);
-    
-    
-    
+
     // Voltar para tela anterior
     Navigator.pop(context);
   }
