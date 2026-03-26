@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/answer_sheet_controller.dart';
-import 'edit_answers_screen.dart'; 
+import 'edit_answers_screen.dart';
 import '../services/answer_sheet_api_service.dart';
 import '../controller/api_config.dart';
 
@@ -22,7 +22,7 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
     required this.studentId,
     required this.examId,
     required this.examGrade,
-    required this.numberOfQuestions
+    required this.numberOfQuestions,
   });
 
   @override
@@ -37,11 +37,11 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     // Testar conexão com a API ao abrir a tela
     _testApiConnection();
   }
-  
+
   Future<void> _testApiConnection() async {
     final apiService = AnswerSheetApiService();
     final isConnected = await apiService.testConnection();
-    
+
     if (!isConnected && mounted) {
       // Mostrar aviso se não conseguir conectar
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,7 +64,6 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -212,13 +211,17 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           Text(
             "Nenhuma imagem capturada",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey[600],),
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
           const SizedBox(height: 8),
           Text(
             "Use o botão abaixo para \ncapturar uma imagem",
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey[500],fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -239,14 +242,82 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
             ),
             child: Column(
               children: [
-                const Text(
-                  "Respostas detectadas:",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+                // Cabeçalho com título e botão de editar na mesma linha
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Respostas detectadas:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                        fontSize: 16,
+                      ),
+                    ),
+                    // Botão Editar com visual de card
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditAnswersScreen(
+                                  studentName: widget.studentName,
+                                  examName: widget.examName,
+                                  answers: controller.extractedAnswers!,
+                                  editedQuestions: controller.editedQuestions,
+                                  onAnswersUpdated: (updatedAnswers) {
+                                    controller.updateExtractedAnswers(
+                                      updatedAnswers,
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.edit, color: Colors.white, size: 18),
+                                SizedBox(width: 6),
+                                Text(
+                                  "Editar",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
+                // Chips das respostas
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -270,7 +341,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     return Chip(
                       label: answer == null
                           ? const SizedBox(
-                              width: 30, // Largura fixa igual aos outros chips
+                              width: 30,
                               child: Center(
                                 child: Icon(
                                   Icons.crop_square,
@@ -284,7 +355,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
-                      ), // Padding uniforme
+                      ),
                     );
                   }).toList(),
                 ),
@@ -300,37 +371,13 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 child: OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: const Text("Nova Captura"),
-                  onPressed: () {
-                    controller.resetEditedFlags(); // Resetar flags
-                    controller.clear();
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-
-              Expanded(
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.edit),
-                  label: const Text("Editar"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Color(0xff004aad),
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditAnswersScreen(
-                          studentName: widget.studentName,
-                          examName: widget.examName,
-                          answers: controller.extractedAnswers!,
-                          editedQuestions: controller.editedQuestions,
-                          onAnswersUpdated: (updatedAnswers) {
-                            controller.updateExtractedAnswers(updatedAnswers);
-                          },
-                        ),
-                      ),
-                    );
+                    controller.resetEditedFlags();
+                    controller.clear();
                   },
                 ),
               ),
@@ -361,10 +408,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       children: [
         Expanded(
           child: ElevatedButton.icon(
-            icon: const Icon(Icons.camera_alt, color: Colors.white,size: 30,),
+            icon: const Icon(Icons.camera_alt, color: Colors.white, size: 30),
             label: const Text(
               "Tirar foto",
-              style: TextStyle(color: Colors.white, fontSize: 18,),
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff004aad),
@@ -378,8 +425,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     examName: widget.examName,
                     studentId: widget.studentId,
                     examId: widget.examId,
-                    numberOfQuestions: widget.numberOfQuestions
-
+                    numberOfQuestions: widget.numberOfQuestions,
                   ),
           ),
         ),
@@ -388,68 +434,66 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
   }
 
   // Add this method to confirm answers and send to your backend if needed
-void _confirmAnswers(List<String?> answers) async {
-  // Show loading dialog
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => const Center(
-      child: CircularProgressIndicator(),
-    ),
-  );
+  void _confirmAnswers(List<String?> answers) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
 
-  try {
-    // Here you can send the answers to your backend if needed
-    // For example:
-    // final apiService = AnswerSheetApiService();
-    // await apiService.saveAnswers(widget.studentId, widget.examId, answers);
-    
-    // Close loading dialog
-    if (context.mounted) {
-      Navigator.pop(context);
-      
-      // Show success dialog
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Sucesso!"),
-          content: Text(
-            "Gabarito de ${widget.studentName} capturado com sucesso.\n"
-            "Respostas: ${answers.where((a) => a != null).length} de ${answers.length} detectadas\n\n"
-            "Respostas: ${answers.map((a) => a ?? '?').join(', ')}",
+    try {
+      // Here you can send the answers to your backend if needed
+      // For example:
+      // final apiService = AnswerSheetApiService();
+      // await apiService.saveAnswers(widget.studentId, widget.examId, answers);
+
+      // Close loading dialog
+      if (context.mounted) {
+        Navigator.pop(context);
+
+        // Show success dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Sucesso!"),
+            content: Text(
+              "Gabarito de ${widget.studentName} capturado com sucesso.\n"
+              "Respostas: ${answers.where((a) => a != null).length} de ${answers.length} detectadas\n\n"
+              "Respostas: ${answers.map((a) => a ?? '?').join(', ')}",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Fecha dialog
+                  Navigator.pop(context); // Volta para tela anterior
+                },
+                child: const Text("OK"),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Fecha dialog
-                Navigator.pop(context); // Volta para tela anterior
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
-    }
-  } catch (e) {
-    // Close loading dialog
-    if (context.mounted) {
-      Navigator.pop(context);
-      
-      // Show error dialog
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Erro"),
-          content: Text("Erro ao salvar respostas: $e"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (context.mounted) {
+        Navigator.pop(context);
+
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Erro"),
+            content: Text("Erro ao salvar respostas: $e"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
-}
 }
