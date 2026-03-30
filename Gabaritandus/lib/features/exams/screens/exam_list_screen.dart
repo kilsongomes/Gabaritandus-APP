@@ -327,36 +327,31 @@ void initState() {
 
     // Cor do status
     Color statusColor = Colors.grey;
-    IconData statusIcon = Icons.help_outline;
     String statusText = "Desconecido";
 
     switch (status) {
       case "active":
-        statusColor = Colors.green;
-        statusIcon = Icons.description;
+        statusColor = Colors.green;        
         statusText = "Disponível";
 
         break;
       case "finished":
-        statusColor = Color(0xff004aad);
-        statusIcon = Icons.description;
+        statusColor = Color(0xff004aad);        
         statusText = "Finalizada";
         break;
       case "pending":
-        statusColor = Colors.orange;
-        statusIcon = Icons.description;
+        statusColor = Colors.orange;        
         statusText = "Em andamento";
         break;
       default:
-        statusColor = Colors.grey;
-        statusIcon = Icons.help_outline;
+        statusColor = Colors.grey;        
         statusText = "Desconecido";
     }
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
-        leading: Icon(statusIcon, color: statusColor),
+        leading: const Icon(Icons.description, color: Colors.grey),
         title: Text(
           examName,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
