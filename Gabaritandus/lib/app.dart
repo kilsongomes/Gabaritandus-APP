@@ -13,7 +13,14 @@ class GabaritandusApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Gabaritandus',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.blue),
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: const Color(0xfff0f4fb), 
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xff004aad),
+            foregroundColor: Colors.white,
+          ),
+        ),
         initialRoute: '/login',
         onGenerateRoute: AppRouter.generateRoute,
       ),
