@@ -123,7 +123,7 @@ void initState() {
                     fontSize: 18,
                   ),
                   maxLines: 2, // Permite até 2 linhas
-                  overflow: TextOverflow.ellipsis, // Adiciona ... se necessário
+                  overflow: TextOverflow.ellipsis, 
                 ),
                 const SizedBox(height: 2),
                 Text(

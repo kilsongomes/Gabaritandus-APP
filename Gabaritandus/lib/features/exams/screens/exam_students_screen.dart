@@ -118,6 +118,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
 
                 return Card(
                   elevation: 2,
+                  color: Color(0xffe5edfa),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

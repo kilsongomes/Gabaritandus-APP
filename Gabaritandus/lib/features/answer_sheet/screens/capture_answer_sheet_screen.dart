@@ -86,6 +86,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     // Informações do aluno/exame
                     Card(
                       elevation: 2,
+                      color: Color( 0xffe5edfa),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
