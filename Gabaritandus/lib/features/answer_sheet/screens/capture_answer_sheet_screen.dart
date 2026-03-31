@@ -334,7 +334,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     if (isEdited) {
                       chipColor = Colors.orange[100]!; // Laranja se editado
                     } else if (answer != null) {
-                      chipColor = Colors.green[100]!; // Verde se detectado
+                      chipColor = Colors.white10; // Branco se detectado
                     } else {
                       chipColor = Colors.grey[200]!; // Cinza se não detectado
                     }

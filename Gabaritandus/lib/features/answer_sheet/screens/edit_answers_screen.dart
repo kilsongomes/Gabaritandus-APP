@@ -56,256 +56,273 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Informações do aluno/exame
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.grey[100],
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.studentName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Card com informações do aluno e exame
+            Card(
+              elevation: 2,
+              color: const Color(0xffe5edfa),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      "Estudante",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.examName,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      widget.studentName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Avaliação",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      widget.examName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            
+            const SizedBox(height: 20),
 
-          // Lista de questões
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _editedAnswers.length,
-              itemBuilder: (context, index) {
-                final questionNumber = index + 1;
-                final selectedOption = _editedAnswers[index];
-                final wasEdited = _locallyEdited[index];
+            // Lista de questões
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: _editedAnswers.length,
+                itemBuilder: (context, index) {
+                  final questionNumber = index + 1;
+                  final selectedOption = _editedAnswers[index];
+                  final wasEdited = _locallyEdited[index];
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Número da questão com indicador de edição
-                        Row(
-                          children: [
-                            Text(
-                              "Questão $questionNumber",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: wasEdited ? Colors.orange : Colors.black,
+                  return Card(
+                    color:  Colors.white70,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Número da questão com indicador de edição
+                          Row(
+                            children: [
+                              Text(
+                                "Questão $questionNumber",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: wasEdited ? Colors.orange : Colors.black,
+                                ),
                               ),
-                            ),
-                            if (wasEdited) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  "Editada",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                              if (wasEdited) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Text(
+                                    "Editada",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ],
-                          ],
-                        ),
-                        const SizedBox(height: 12),
+                          ),
+                          const SizedBox(height: 16),
 
-                        // Opções A, B, C, D e botões Branco/Rasura
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                          // Opções A, B, C, D (círculos ocupando todo o espaço)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: options.map((option) {
+                              final isSelected = selectedOption == option;
+
+                              return Expanded(
+                                child: Center(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        // Se clicar na mesma opção, desmarca
+                                        if (isSelected) {
+                                          _editedAnswers[index] = null;
+                                        } else {
+                                          _editedAnswers[index] = option;
+                                        }
+                                        _locallyEdited[index] = true;
+                                      });
+                                    },
+                                    child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isSelected
+                                            ? Colors.grey[600]
+                                            : Colors.grey[200],
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? Colors.grey[600]!
+                                              : Colors.grey[400]!,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          option,
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: isSelected
+                                                ? Colors.white
+                                                : Colors.grey[600],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // Botões Branco e Marcação Dupla na parte inferior (retangulares)
+                          Row(
                             children: [
-                              ...options.map((option) {
-                                final isSelected = selectedOption == option;
-
-                                return GestureDetector(
+                              Expanded(
+                                child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      // Se clicar na mesma opção, desmarca
-                                      if (isSelected) {
+                                      if (selectedOption == "Branco") {
                                         _editedAnswers[index] = null;
                                       } else {
-                                        _editedAnswers[index] = option;
+                                        _editedAnswers[index] = "Branco";
                                       }
                                       _locallyEdited[index] = true;
                                     });
                                   },
                                   child: Container(
-                                    width: 60,
                                     padding: const EdgeInsets.symmetric(
-                                      vertical: 8,
+                                      vertical: 12,
+                                      horizontal: 8,
                                     ),
-                                    child: Column(
-                                      children: [
-                                        // Bolinha
-                                        Container(
-                                          width: 50,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: isSelected
-                                                ? Colors.grey[600]
-                                                : Colors.grey[200],
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? Colors.grey[600]!
-                                                  : Colors.grey[400]!,
-                                              width: 2,
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              option,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: isSelected
-                                                    ? Colors.white
-                                                    : Colors.grey[600],
-                                              ),
-                                            ),
-                                          ),
+                                    decoration: BoxDecoration(
+                                      color: selectedOption == "Branco"
+                                          ? Colors.grey[600]
+                                          : Colors.grey[200],
+                                      border: Border.all(
+                                        color: selectedOption == "Branco"
+                                            ? Colors.grey[600]!
+                                            : Colors.grey[400]!,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Branco",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: selectedOption == "Branco"
+                                              ? Colors.white
+                                              : Colors.grey[600],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                );
-                              }).toList(),
-
-                              // Botões Branco e Rasura (um acima do outro)
-                              Container(
-                                width: 60,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
                                 ),
-                                child: Column(
-                                  children: [
-                                    // Botão Branco (texto "Branco")
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (selectedOption == "Branco") {
-                                            _editedAnswers[index] = null;
-                                          } else {
-                                            _editedAnswers[index] = "Branco";
-                                          }
-                                          _locallyEdited[index] = true;
-                                        });
-                                      },
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: selectedOption == "Branco"
-                                              ? Colors.grey[600]
-                                              : Colors.white,
-                                          border: Border.all(
-                                            color: selectedOption == "Branco"
-                                                ? Colors.grey[600]!
-                                                : Colors.grey[400]!,
-                                            width: 2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            "Branco",
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (selectedOption == "Marcação dupla") {
+                                        _editedAnswers[index] = null;
+                                      } else {
+                                        _editedAnswers[index] = "Marcação dupla";
+                                      }
+                                      _locallyEdited[index] = true;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: selectedOption == "Marcação dupla"
+                                          ? Colors.grey[600]
+                                          : Colors.grey[200],
+                                      border: Border.all(
+                                        color: selectedOption == "Marcação dupla"
+                                            ? Colors.grey[600]!
+                                            : Colors.grey[400]!,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Marcação dupla",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: selectedOption == "Marcação dupla"
+                                              ? Colors.white
+                                              : Colors.grey[600],
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    // Botão Rasura (texto "Rasura")
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (selectedOption == "Rasura") {
-                                            _editedAnswers[index] = null;
-                                          } else {
-                                            _editedAnswers[index] = "Rasura";
-                                          }
-                                          _locallyEdited[index] = true;
-                                        });
-                                      },
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: selectedOption == "Rasura"
-                                              ? Colors.grey
-                                              : Colors.white,
-                                          border: Border.all(
-                                            color: selectedOption == "Rasura"
-                                                ? Colors.grey[600]!
-                                                : Colors.grey[400]!,
-                                            width: 2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            "Rasura",
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
