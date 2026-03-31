@@ -237,9 +237,9 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.green[50],
+              color: Color(0xffe5edfa),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green),
+              
             ),
             child: Column(
               children: [
@@ -252,7 +252,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                       "Respostas detectadas:",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        
                         fontSize: 16,
                       ),
                     ),
@@ -263,7 +263,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.3),
+                            color: Colors.orange.withValues(alpha: 0.3),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -351,7 +351,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                                 ),
                               ),
                             )
-                          : Text("${index + 1}: $answer"),
+                          : Text("${index + 1}. $answer"),
                       backgroundColor: chipColor,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
