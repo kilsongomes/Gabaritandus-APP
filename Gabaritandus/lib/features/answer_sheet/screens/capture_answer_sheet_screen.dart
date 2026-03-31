@@ -86,7 +86,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     // Informações do aluno/exame
                     Card(
                       elevation: 2,
-                      color: Color( 0xffe5edfa),
+                      color: Color(0xffe5edfa),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -124,7 +124,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                               ),
                             ),
                             Text(
-                              widget.examGrade,
+                              '(${widget.examGrade})',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -329,29 +329,31 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     final answer = entry.value;
                     final isEdited = controller.editedQuestions[index];
 
-                    // Cor baseada em edição
+                    // Determinar a cor baseada no valor
                     Color chipColor;
+                    String displayText;
+                    
                     if (isEdited) {
                       chipColor = Colors.orange[100]!; // Laranja se editado
-                    } else if (answer != null) {
-                      chipColor = Colors.white10; // Branco se detectado
+                    } else if (answer == null) {
+                      chipColor = Colors.orange.withValues(alpha: 0.3); // Laranja claro para null
                     } else {
-                      chipColor = Colors.grey[200]!; // Cinza se não detectado
+                      chipColor = Colors.white10; // Branco se detectado
+                    }
+                    
+                    // Determinar o texto a ser exibido
+                    if (answer == null) {
+                      displayText = "?";
+                    } else if (answer == "Branco") {
+                      displayText = "∅";
+                    } else if (answer == "Marcação dupla") {
+                      displayText = "●●";
+                    } else {
+                      displayText = answer;
                     }
 
                     return Chip(
-                      label: answer == null
-                          ? const SizedBox(
-                              width: 30,
-                              child: Center(
-                                child: Icon(
-                                  Icons.crop_square,
-                                  size: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            )
-                          : Text("${index + 1}. $answer"),
+                      label: Text("${index + 1}. $displayText"),
                       backgroundColor: chipColor,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,

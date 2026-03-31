@@ -41,20 +41,6 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
         title: const Text("Editar Respostas"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
-        actions: [
-          // Botão Salvar
-          TextButton(
-            onPressed: _saveChanges,
-            child: const Text(
-              "SALVAR",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -107,21 +93,48 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
 
             // Lista de questões
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.zero,
-                itemCount: _editedAnswers.length,
+                // Adicionamos +1 para o botão ao final
+                itemCount: _editedAnswers.length + 1,
                 itemBuilder: (context, index) {
+                  // Se for o último índice, retornamos o botão de salvar
+                  if (index == _editedAnswers.length) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                      child: ElevatedButton(
+                        onPressed: _saveChanges,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff004aad),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "SALVAR",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Caso contrário, renderiza o Card da questão normalmente
                   final questionNumber = index + 1;
                   final selectedOption = _editedAnswers[index];
                   final wasEdited = _locallyEdited[index];
 
                   return Card(
-                    color:  Colors.white70,
+                    color: Colors.white70,
                     margin: const EdgeInsets.only(bottom: 12),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -136,7 +149,9 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: wasEdited ? Colors.orange : Colors.black,
+                                  color: wasEdited
+                                      ? Colors.orange
+                                      : Colors.black,
                                 ),
                               ),
                               if (wasEdited) ...[
@@ -217,9 +232,9 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                               );
                             }).toList(),
                           ),
-                          
+
                           const SizedBox(height: 20),
-                          
+
                           // Botões Branco e Marcação Dupla na parte inferior (retangulares)
                           Row(
                             children: [
@@ -275,7 +290,8 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                       if (selectedOption == "Marcação dupla") {
                                         _editedAnswers[index] = null;
                                       } else {
-                                        _editedAnswers[index] = "Marcação dupla";
+                                        _editedAnswers[index] =
+                                            "Marcação dupla";
                                       }
                                       _locallyEdited[index] = true;
                                     });
@@ -290,7 +306,8 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                           ? Colors.grey[600]
                                           : Colors.grey[200],
                                       border: Border.all(
-                                        color: selectedOption == "Marcação dupla"
+                                        color:
+                                            selectedOption == "Marcação dupla"
                                             ? Colors.grey[600]!
                                             : Colors.grey[400]!,
                                         width: 2,
@@ -303,7 +320,8 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: selectedOption == "Marcação dupla"
+                                          color:
+                                              selectedOption == "Marcação dupla"
                                               ? Colors.white
                                               : Colors.grey[600],
                                         ),
