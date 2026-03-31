@@ -113,18 +113,18 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                             ),
                             const SizedBox(height: 8),
                             const Text(
-                              "",
-                              style: TextStyle(fontSize: 3, color: Colors.grey),
+                              "Avaliação",
+                              style: TextStyle(fontSize: 12, color: Colors.grey,fontWeight: FontWeight.bold,),
                             ),
-                            Text(
-                              widget.examName,
+                            Text('${widget.examName} - (${widget.examGrade})',
+                              
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              '(${widget.examGrade})',
+                              "",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
