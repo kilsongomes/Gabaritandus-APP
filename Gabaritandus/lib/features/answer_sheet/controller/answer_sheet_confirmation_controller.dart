@@ -17,21 +17,59 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
     return _hasAllAnswers;
   }
 
-  /// Obtém estatísticas das respostas
-  Map<String, dynamic> getAnswerStats(List<String?> answers) {
-    final total = answers.length;
-    final answered = answers.where((a) => a != null).length;
-    final unanswered = total - answered;
-    final blankAnswers = answers.where((a) => a == "Branco").length;
-    final doubleMarks = answers.where((a) => a == "Marcação dupla").length;
+  /// Obtém a lista de questões não identificadas
+  List<int> getUnansweredQuestions(List<String?> answers) {
+    final unanswered = <int>[];
+    for (int i = 0; i < answers.length; i++) {
+      if (answers[i] == null) {
+        unanswered.add(i + 1); // +1 porque questão começa em 1
+      }
+    }
+    return unanswered;
+  }
+
+  /// Formata a lista de questões para exibição
+  String _formatQuestionsList(List<int> questions) {
+    if (questions.isEmpty) return '';
     
-    return {
-      'total': total,
-      'answered': answered,
-      'unanswered': unanswered,
-      'blankAnswers': blankAnswers,
-      'doubleMarks': doubleMarks,
-    };
+    if (questions.length == 1) {
+      return '${questions[0]}';
+    }
+    
+    // Verificar se são questões consecutivas
+    final List<String> parts = [];
+    int start = questions[0];
+    int end = questions[0];
+    
+    for (int i = 1; i < questions.length; i++) {
+      if (questions[i] == end + 1) {
+        end = questions[i];
+      } else {
+        if (start == end) {
+          parts.add('$start');
+        } else {
+          parts.add('$start-$end');
+        }
+        start = questions[i];
+        end = questions[i];
+      }
+    }
+    
+    // Adicionar o último intervalo
+    if (start == end) {
+      parts.add('$start');
+    } else {
+      parts.add('$start-$end');
+    }
+    
+    if (parts.length == 1) {
+      return parts[0];
+    } else if (parts.length == 2) {
+      return '${parts[0]} e ${parts[1]}';
+    } else {
+      final lastPart = parts.removeLast();
+      return '${parts.join(', ')} e $lastPart';
+    }
   }
 
   /// Mostra modal de aviso para respostas faltantes
@@ -40,7 +78,8 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
     BuildContext context, {
     required List<String?> answers,
   }) async {
-    final stats = getAnswerStats(answers);
+    final unansweredQuestions = getUnansweredQuestions(answers);
+    final formattedQuestions = _formatQuestionsList(unansweredQuestions);
     
     return await showDialog<bool>(
       context: context,
@@ -48,14 +87,14 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+            Icon(Icons.warning_amber_rounded, size: 28),
             SizedBox(width: 8),
             Text(
               "Atenção!",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.orange,
+                
               ),
             ),
           ],
@@ -63,61 +102,33 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "A leitura do gabarito não identificou todas as respostas.",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
+          children: [            
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Colors.orange[50],
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
+                border: Border.all(color: Colors.orange[200]!),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  _buildStatRow(
-                    "Total de questões:",
-                    "${stats['total']}",
-                    Icons.help_outline,
-                  ),
-                  const Divider(),
-                  _buildStatRow(
-                    "Respostas identificadas:",
-                    "${stats['answered']}",
-                    Icons.check_circle,
-                    color: Colors.green,
-                  ),
-                  _buildStatRow(
-                    "Não identificadas:",
-                    "${stats['unanswered']}",
-                    Icons.error_outline,
-                    color: Colors.orange,
-                  ),
-                  if (stats['blankAnswers'] > 0)
-                    _buildStatRow(
-                      "Questões em branco:",
-                      "${stats['blankAnswers']}",
-                      Icons.radio_button_unchecked,
-                      color: Colors.blue,
+                  Icon(Icons.edit_note, color: Colors.grey[800], size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "Antes de enviar, revise e edite as alternativas ${unansweredQuestions.length == 1 ? '' : 'das questões '}$formattedQuestions",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  if (stats['doubleMarks'] > 0)
-                    _buildStatRow(
-                      "Marcações duplas:",
-                      "${stats['doubleMarks']}",
-                      Icons.change_circle,
-                      color: Colors.purple,
-                    ),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              "Você pode editar as respostas manualmente antes de continuar.",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
+            const SizedBox(height: 16),            
           ],
         ),
         actions: [
@@ -135,7 +146,7 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
               Navigator.pop(context, true);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
+              backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
             child: const Text("Entendi"),
@@ -145,44 +156,13 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
     ) ?? false;
   }
 
-  Widget _buildStatRow(String label, String value, IconData icon, {Color? color}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 18, color: color ?? Colors.grey[600]),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                ),
-              ),
-            ],
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: color ?? Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// Mostra modal de sucesso quando todas respostas são identificadas
   Future<bool> showSuccessDialog(
     BuildContext context, {
     required List<String?> answers,
   }) async {
-    final stats = getAnswerStats(answers);
+    final answeredCount = answers.where((a) => a != null).length;
+    final totalCount = answers.length;
     
     return await showDialog<bool>(
       context: context,
@@ -205,9 +185,9 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Todas as respostas foram identificadas com sucesso!",
-              style: TextStyle(fontSize: 16),
+            Text(
+              "Todas as $totalCount questões foram identificadas com sucesso!",
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
             Container(
@@ -217,20 +197,19 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.green[200]!),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  _buildStatRow(
-                    "Total de questões:",
-                    "${stats['total']}",
-                    Icons.help_outline,
-                    color: Colors.grey,
-                  ),
-                  const Divider(),
-                  _buildStatRow(
-                    "Respostas identificadas:",
-                    "${stats['answered']}",
-                    Icons.check_circle,
-                    color: Colors.green,
+                  Icon(Icons.verified, color: Colors.green[700], size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "$answeredCount de $totalCount respostas detectadas corretamente",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.green[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ],
               ),
