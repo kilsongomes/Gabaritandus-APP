@@ -48,6 +48,7 @@ class AnswerSheetApiService {
       print("   Imagem carregada: ${bytes.length} bytes");
       
       // Criar o corpo multipart manualmente
+      // ignore: deprecated_export_use
       final buffer = BytesBuilder();
       
       // Adicionar o arquivo
