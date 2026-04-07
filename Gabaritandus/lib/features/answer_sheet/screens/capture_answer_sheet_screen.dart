@@ -7,9 +7,7 @@ import 'edit_answers_screen.dart';
 import '../services/answer_sheet_api_service.dart';
 import '../controller/api_config.dart';
 import '../controller/answer_sheet_confirmation_controller.dart';
-import 'review_answer_sheet_screen.dart';
-
-
+import '../../answer_sheet/screens/review_answer_sheet_screen.dart';
 
 class CaptureAnswerSheetScreen extends StatefulWidget {
   final String studentName;
@@ -35,10 +33,18 @@ class CaptureAnswerSheetScreen extends StatefulWidget {
 }
 
 class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
+  final ScrollController _answersScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _testApiConnection();
+  }
+
+  @override
+  void dispose() {
+    _answersScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _testApiConnection() async {
@@ -65,6 +71,14 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
         ),
       );
     }
+  }
+
+  /// Formata o número da questão com 2 dígitos (espaço invisível para 1-9)
+  String _formatQuestionNumber(int number) {
+    if (number < 10) {
+      return ' $number'; // Espaço antes do número para ter 2 caracteres
+    }
+    return '$number';
   }
 
   @override
@@ -241,6 +255,9 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       return const SizedBox.shrink();
     }
 
+    final answers = controller.extractedAnswers!;
+    final hasManyQuestions = answers.length > 12; // Mostrar barra de scroll se tiver mais de 12 questões
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xffe5edfa),
@@ -255,12 +272,19 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Respostas detectadas:",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                Row(
+                  children: [
+                    const Text(
+                      "Respostas detectadas:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (hasManyQuestions) ...[
+                      const SizedBox(width: 8),                      
+                    ],
+                  ],
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -325,50 +349,62 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
             ),
           ),
           
-          // Área rolável das respostas
+          // Área rolável das respostas COM barra de scroll visível
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: controller.extractedAnswers!.asMap().entries.map((
-                  entry,
-                ) {
-                  final index = entry.key;
-                  final answer = entry.value;
-                  final isEdited = controller.editedQuestions[index];
+            child: Scrollbar(
+              controller: _answersScrollController,
+              thumbVisibility: true, // 🔥 Barra de scroll sempre visível
+              trackVisibility: true, // 🔥 Mostra a trilha da barra
+              radius: const Radius.circular(8),
+              thickness: 6,
+              child: SingleChildScrollView(
+                controller: _answersScrollController,
+                padding: const EdgeInsets.all(12),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: answers.asMap().entries.map((
+                    entry,
+                  ) {
+                    final index = entry.key;
+                    final answer = entry.value;
+                    final isEdited = controller.editedQuestions[index];
+                    final questionNumber = index + 1;
+                    final formattedNumber = _formatQuestionNumber(questionNumber);
 
-                  Color chipColor;
-                  String displayText;
-                  
-                  if (isEdited) {
-                    chipColor = Colors.orange[100]!;
-                  } else if (answer == null) {
-                    chipColor = Colors.orange.withValues(alpha: 0.3);
-                  } else {
-                    chipColor = Colors.white10;
-                  }
-                  
-                  if (answer == null) {
-                    displayText = "?";
-                  } else if (answer == "Branco") {
-                    displayText = "B";
-                  } else if (answer == "Marcação dupla") {
-                    displayText = "!!";
-                  } else {
-                    displayText = answer;
-                  }
+                    Color chipColor;
+                    String displayText;
+                    
+                    if (isEdited) {
+                      chipColor = Colors.orange[100]!;
+                    } else if (answer == null) {
+                      chipColor = Colors.orange.withValues(alpha: 0.3);
+                    } else {
+                      chipColor = Colors.white10;
+                    }
+                    
+                    if (answer == null) {
+                      displayText = "?";
+                    } else if (answer == "Branco") {
+                      displayText = "B";
+                    } else if (answer == "Marcação dupla") {
+                      displayText = "!!";
+                    } else {
+                      displayText = answer;
+                    }
 
-                  return Chip(
-                    label: Text("${index + 1}. $displayText"),
-                    backgroundColor: chipColor,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                  );
-                }).toList(),
+                    return Chip(
+                      label: Text("$formattedNumber. $displayText"),
+                      backgroundColor: chipColor,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ),
