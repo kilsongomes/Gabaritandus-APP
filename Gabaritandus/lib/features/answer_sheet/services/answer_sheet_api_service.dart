@@ -25,7 +25,8 @@ class AnswerSheetApiService {
       final endpoint = numberOfQuestions == 20 
           ? "/processar_20_questoes" 
           : "/processar_10_questoes";
-      
+          
+      print("   📍 Usando endpoint: $endpoint (baseado em $numberOfQuestions questões)");
       final uri = Uri.parse("$baseUrl$endpoint");
       print("   URL: $uri");
       

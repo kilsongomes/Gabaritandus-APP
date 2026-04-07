@@ -10,7 +10,7 @@ class ExamStudentsScreen extends StatefulWidget {
   final int groupId;
   final String examGrade;
   final String disciplineName;
-  final int numberOfQuestions;
+  
 
   const ExamStudentsScreen({
     super.key,
@@ -19,7 +19,7 @@ class ExamStudentsScreen extends StatefulWidget {
     required this.groupId,
     required this.examGrade,
     required this.disciplineName,
-    required this.numberOfQuestions
+    
   });
 
   @override
@@ -84,6 +84,17 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
   }
 
   void _navigateToCaptureScreen(String studentName, dynamic studentId) {
+
+    final controller = Provider.of<ExamController>(context, listen: false);
+    final exam = controller.currentExam;
+    final questions = exam?["questions"] as List?;
+    final numberOfQuestions = questions?.length ?? 10;
+
+    print("🔍 [ExamStudentsScreen] Navegando para captura com:");
+    print("   studentName: $studentName");
+    print("   examName: ${widget.examName}");
+    print("   numberOfQuestions: ${numberOfQuestions}");
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -93,7 +104,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
           studentId: studentId,
           examId: widget.examId,
           examGrade: widget.examGrade,
-          numberOfQuestions: widget.numberOfQuestions,
+          numberOfQuestions: numberOfQuestions,
         ),
       ),
     );
@@ -115,6 +126,8 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                 if (exam == null || controller.loading) {
                   return const SizedBox();
                 }
+                final questions = exam["questions"] as List?;
+                final numberOfQuestions = questions?.length ?? 10;
 
                 return Card(
                   elevation: 2,
@@ -155,7 +168,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                "${(exam["questions"] as List?)?.length ?? 0} questões",
+                                "$numberOfQuestions questões",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -561,7 +574,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
 
           // Botão para capturar gabarito
           IconButton(
-            icon: Icon(Icons.camera_alt_outlined, color: Colors.grey, size: 24,),
+            icon: Icon(Icons.camera_alt_outlined, color: Colors.grey, size: 24),
             onPressed: () {
               _navigateToCaptureScreen(studentName, studentId);
             },

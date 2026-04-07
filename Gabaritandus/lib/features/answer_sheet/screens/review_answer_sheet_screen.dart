@@ -5,16 +5,21 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   final String studentName;
   final String examName;
   final List<String?> answers;
+  final int numberOfQuestions; // Adicionado
 
   const ReviewAnswerSheetScreen({
     super.key,
     required this.studentName,
     required this.examName,
     required this.answers,
+    required this.numberOfQuestions,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Determinar quantas alternativas baseado no número de questões
+    final int alternativesCount = numberOfQuestions == 20 ? 5 : 4;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text("Revisar Gabarito"),
@@ -23,7 +28,6 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              // TODO: Implementar confirmação final
               _confirmAndFinish(context);
             },
             child: const Text(
@@ -82,10 +86,37 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      "$numberOfQuestions questões • $alternativesCount alternativas",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+          
+          // Resumo estatístico
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildSummaryCard(),
+          ),
+          
+          const SizedBox(height: 16),
           
           // Lista de respostas para revisão
           Expanded(
@@ -160,6 +191,79 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+  
+  Widget _buildSummaryCard() {
+    final answered = answers.where((a) => a != null).length;
+    final total = answers.length;
+    final blankAnswers = answers.where((a) => a == "Branco").length;
+    final doubleMarks = answers.where((a) => a == "Marcação dupla").length;
+    
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem(
+            "Identificadas",
+            "$answered/$total",
+            Icons.check_circle,
+            Colors.green,
+          ),
+          Container(
+            width: 1,
+            height: 30,
+            color: Colors.grey[300],
+          ),
+          _buildStatItem(
+            "Branco",
+            blankAnswers.toString(),
+            Icons.radio_button_unchecked,
+            Colors.blue,
+          ),
+          Container(
+            width: 1,
+            height: 30,
+            color: Colors.grey[300],
+          ),
+          _buildStatItem(
+            "Marc. Dupla",
+            doubleMarks.toString(),
+            Icons.change_circle,
+            Colors.purple,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: color),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
     );
   }
   

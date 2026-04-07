@@ -288,6 +288,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                                   examName: widget.examName,
                                   answers: controller.extractedAnswers!,
                                   editedQuestions: controller.editedQuestions,
+                                  numberOfQuestions: widget.numberOfQuestions,
                                   onAnswersUpdated: (updatedAnswers) {
                                     controller.updateExtractedAnswers(
                                       updatedAnswers,
@@ -455,6 +456,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       final shouldReview = await confirmationController.showSuccessDialog(
         context,
         answers: answers,
+        numberOfQuestions: widget.numberOfQuestions,
       );
 
       if (shouldReview) {
@@ -476,6 +478,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
         builder: (context) => ReviewAnswerSheetScreen(
           studentName: widget.studentName,
           examName: widget.examName,
+          numberOfQuestions: widget.numberOfQuestions,
           answers: answers,
         ),
       ),

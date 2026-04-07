@@ -48,6 +48,10 @@ class AnswerSheetController extends ChangeNotifier {
     _currentExamId = examId;
     _currentNumberOfQuestions = numberOfQuestions;
 
+    print("📷 [AnswerSheetController] Abrindo câmera com overlay...");
+    print("   📊 Número de questões informado: $numberOfQuestions");
+    print("   📚 Nome do exame: $examName");
+
     try {
       print("📷 [AnswerSheetController] Abrindo câmera com overlay...");
 
@@ -145,6 +149,8 @@ class AnswerSheetController extends ChangeNotifier {
       if (_currentNumberOfQuestions == null) {
         throw Exception("Número de questões não definido");
       }
+
+      print("   🚀 Chamando processAnswerSheet com ${_currentNumberOfQuestions} questões");
 
       _extractedAnswers = await _reader.processAnswerSheet(
         imageFile,
