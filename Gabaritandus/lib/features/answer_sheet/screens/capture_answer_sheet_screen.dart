@@ -142,7 +142,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 8),                            
+                            const SizedBox(height: 8),
                           ],
                         ),
                       ),
@@ -152,7 +152,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
 
                     // Área da imagem com altura flexível
                     Flexible(
-                      flex: 2,
+                      flex: 3,
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -167,10 +167,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     const SizedBox(height: 20),
 
                     // Área das respostas detectadas com altura flexível e scroll
-                    Flexible(
-                      flex: 3,
-                      child: _buildAnswersSection(controller),
-                    ),
+                    Flexible(flex: 4, child: _buildAnswersSection(controller)),
 
                     const SizedBox(height: 12),
 
@@ -256,7 +253,9 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     }
 
     final answers = controller.extractedAnswers!;
-    final hasManyQuestions = answers.length > 12; // Mostrar barra de scroll se tiver mais de 12 questões
+    final hasManyQuestions =
+        answers.length >
+        12; // Mostrar barra de scroll se tiver mais de 12 questões
 
     return Container(
       decoration: BoxDecoration(
@@ -281,9 +280,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                         fontSize: 16,
                       ),
                     ),
-                    if (hasManyQuestions) ...[
-                      const SizedBox(width: 8),                      
-                    ],
+                    if (hasManyQuestions) ...[const SizedBox(width: 8)],
                   ],
                 ),
                 Container(
@@ -348,7 +345,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
               ],
             ),
           ),
-          
+
           // Área rolável das respostas COM barra de scroll visível
           Expanded(
             child: Scrollbar(
@@ -363,18 +360,18 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: answers.asMap().entries.map((
-                    entry,
-                  ) {
+                  children: answers.asMap().entries.map((entry) {
                     final index = entry.key;
                     final answer = entry.value;
                     final isEdited = controller.editedQuestions[index];
                     final questionNumber = index + 1;
-                    final formattedNumber = _formatQuestionNumber(questionNumber);
+                    final formattedNumber = _formatQuestionNumber(
+                      questionNumber,
+                    );
 
                     Color chipColor;
                     String displayText;
-                    
+
                     if (isEdited) {
                       chipColor = Colors.orange[100]!;
                     } else if (answer == null) {
@@ -382,13 +379,13 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     } else {
                       chipColor = Colors.white10;
                     }
-                    
+
                     if (answer == null) {
                       displayText = "?";
                     } else if (answer == "Branco") {
-                      displayText = "B";
+                      displayText = "∅";
                     } else if (answer == "Marcação dupla") {
-                      displayText = "!!";
+                      displayText = "••";
                     } else {
                       displayText = answer;
                     }
@@ -485,36 +482,22 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
   void _confirmAnswers(List<String?> answers) async {
     final confirmationController = AnswerSheetConfirmationController();
     final hasAllAnswers = confirmationController.checkAllAnswers(answers);
-    
+
     if (hasAllAnswers) {
       final shouldReview = await confirmationController.showSuccessDialog(
         context,
         answers: answers,
         numberOfQuestions: widget.numberOfQuestions,
       );
-      
+
       if (shouldReview) {
         _navigateToReviewScreen(answers);
       }
     } else {
-      final understood = await confirmationController.showMissingAnswersDialog(
+      await confirmationController.showMissingAnswersDialog(
         context,
         answers: answers,
       );
-      
-      if (understood && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Clique no botão "Editar" acima para corrigir as respostas manualmente',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
     }
   }
 

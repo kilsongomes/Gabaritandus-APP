@@ -131,16 +131,7 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
             const SizedBox(height: 16),            
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            child: const Text(
-              "Cancelar",
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
+        actions: [          
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context, true);
@@ -149,7 +140,7 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            child: const Text("Entendi"),
+            child: Center(child: const Text("Entendi")),
           ),
         ],
       ),

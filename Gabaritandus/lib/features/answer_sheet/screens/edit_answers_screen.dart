@@ -6,7 +6,7 @@ class EditAnswersScreen extends StatefulWidget {
   final String examName;
   final List<String?> answers;
   final List<bool> editedQuestions;
-  final int numberOfQuestions; // Adicionado
+  final int numberOfQuestions;
   final Function(List<String?>) onAnswersUpdated;
 
   const EditAnswersScreen({
@@ -32,8 +32,6 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
   void initState() {
     super.initState();
     // Definir opções baseado no número de questões
-    // Normalmente provas com 20 questões têm 5 alternativas (A-E)
-    // Mas vamos manter flexível
     if (widget.numberOfQuestions == 20) {
       options = ['A', 'B', 'C', 'D', 'E'];
     } else {
@@ -43,19 +41,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
     // Copiar as respostas para edição
     _editedAnswers = List.from(widget.answers);
     _locallyEdited = List.from(widget.editedQuestions);
-  }
-
-  String _getDisplayText(String? answer) {
-    if (answer == null) {
-      return "?";
-    } else if (answer == "Branco") {
-      return "B";
-    } else if (answer == "Marcação dupla") {
-      return "!!";
-    } else {
-      return answer;
-    }
-  }
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -64,20 +50,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
         title: const Text("Editar Respostas"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
-        actions: [
-          // Botão Salvar
-          TextButton(
-            onPressed: _saveChanges,
-            child: const Text(
-              "SALVAR",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
+        // 🔥 Botão Salvar removido da AppBar
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -125,26 +98,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        "${widget.numberOfQuestions} questões • ${options.length} alternativas",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.blue[800],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                    ),                                       
                   ],
                 ),
               ),
@@ -152,16 +106,41 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
             
             const SizedBox(height: 20),
 
-            // Lista de questões
+            // Lista de questões com botão no final
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.zero,
-                itemCount: _editedAnswers.length,
+                itemCount: _editedAnswers.length + 1, // +1 para o botão
                 itemBuilder: (context, index) {
+                  // Se for o último item, mostrar o botão Salvar
+                  if (index == _editedAnswers.length) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: ElevatedButton.icon(
+                        onPressed: _saveChanges,
+                        icon: const Icon(Icons.save, color: Colors.white),
+                        label: const Text(
+                          "SALVAR ALTERAÇÕES",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  
                   final questionNumber = index + 1;
                   final selectedOption = _editedAnswers[index];
-                  final wasEdited = _locallyEdited[index];
-                  final displayText = _getDisplayText(selectedOption);
+                  final wasEdited = _locallyEdited[index];                  
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
@@ -204,65 +183,9 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                               ],
                             ],
                           ),
-                          const SizedBox(height: 16),
-
-                          // Exibir a resposta atual com o símbolo correspondente
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: selectedOption == null
-                                  ? Colors.orange.withValues(alpha: 0.3)
-                                  : Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: selectedOption == null
-                                    ? Colors.orange
-                                    : Colors.grey[300]!,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Resposta atual:",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: selectedOption == null
-                                        ? Colors.orange.withValues(alpha: 0.2)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: selectedOption == null
-                                          ? Colors.orange
-                                          : Colors.grey[400]!,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    displayText,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: selectedOption == null
-                                          ? Colors.orange[800]
-                                          : Colors.grey[700],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Opções A, B, C, D, E (círculos ocupando todo o espaço)
+                          const SizedBox(height: 16),                         
+          
+                          // Opções A, B, C, D, E (círculos)
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -273,7 +196,6 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                               return GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    // Se clicar na mesma opção, desmarca
                                     if (isSelected) {
                                       _editedAnswers[index] = null;
                                     } else {
@@ -283,8 +205,8 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                   });
                                 },
                                 child: Container(
-                                  width: 60,
-                                  height: 60,
+                                  width: 50,
+                                  height: 50,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: isSelected
@@ -316,7 +238,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                           
                           const SizedBox(height: 20),
                           
-                          // Botões Branco e Marcação Dupla na parte inferior (retangulares)
+                          // Botões Branco e Marcação Dupla (sem símbolos internos)
                           Row(
                             children: [
                               Expanded(
@@ -349,38 +271,15 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Center(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Branco",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: selectedOption == "Branco"
-                                                  ? Colors.white
-                                                  : Colors.grey[600],
-                                            ),
-                                          ),
-                                          if (selectedOption == "Branco") ...[
-                                            const SizedBox(width: 8),
-                                            Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: const Text(
-                                                "B",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ],
+                                      child: Text(
+                                        "Branco",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: selectedOption == "Branco"
+                                              ? Colors.white
+                                              : Colors.grey[600],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -417,38 +316,15 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Center(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Marcação dupla",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: selectedOption == "Marcação dupla"
-                                                  ? Colors.white
-                                                  : Colors.grey[600],
-                                            ),
-                                          ),
-                                          if (selectedOption == "Marcação dupla") ...[
-                                            const SizedBox(width: 8),
-                                            Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: const Text(
-                                                "!!",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ],
+                                      child: Text(
+                                        "Marcação dupla",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: selectedOption == "Marcação dupla"
+                                              ? Colors.white
+                                              : Colors.grey[600],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -472,6 +348,15 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
   void _saveChanges() {
     // Chamar o callback com as respostas editadas
     widget.onAnswersUpdated(_editedAnswers);
+    
+    // Mostrar mensagem de sucesso
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Respostas salvas com sucesso!"),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
 
     // Voltar para tela anterior
     Navigator.pop(context);
