@@ -9,6 +9,8 @@ import '../controller/api_config.dart';
 import '../controller/answer_sheet_confirmation_controller.dart';
 import 'review_answer_sheet_screen.dart';
 
+
+
 class CaptureAnswerSheetScreen extends StatefulWidget {
   final String studentName;
   final String examName;
@@ -36,7 +38,6 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
   @override
   void initState() {
     super.initState();
-    // Testar conexão com a API ao abrir a tela
     _testApiConnection();
   }
 
@@ -45,7 +46,6 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     final isConnected = await apiService.testConnection();
 
     if (!isConnected && mounted) {
-      // Mostrar aviso se não conseguir conectar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -88,11 +88,11 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     // Informações do aluno/exame
                     Card(
                       elevation: 2,
-                      color: Color(0xffe5edfa),
+                      color: const Color(0xffe5edfa),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      margin: EdgeInsets.all(0),
+                      margin: EdgeInsets.zero,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
@@ -114,29 +114,21 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              "Avaliação",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                             Text(
-                              '${widget.examName} - (${widget.examGrade})',
-
+                              widget.examName,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              "",
+                              widget.examGrade,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                            const SizedBox(height: 8),                            
                           ],
                         ),
                       ),
@@ -144,7 +136,9 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
 
                     const SizedBox(height: 20),
 
-                    Expanded(
+                    // Área da imagem com altura flexível
+                    Flexible(
+                      flex: 2,
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -158,10 +152,16 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
 
                     const SizedBox(height: 20),
 
-                    // Botões de ação
-                    _buildActionButtons(controller),
+                    // Área das respostas detectadas com altura flexível e scroll
+                    Flexible(
+                      flex: 3,
+                      child: _buildAnswersSection(controller),
+                    ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
+
+                    // Botões de ação (fixos no final)
+                    _buildActionButtons(controller),
                   ],
                 ),
               );
@@ -236,180 +236,181 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     );
   }
 
-  Widget _buildActionButtons(AnswerSheetController controller) {
-    if (controller.extractedAnswers != null) {
-      return Column(
-        children: [
-          // Mostrar respostas extraídas
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Color(0xffe5edfa),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                // Cabeçalho com título e botão de editar na mesma linha
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Respostas detectadas:",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+  Widget _buildAnswersSection(AnswerSheetController controller) {
+    if (controller.extractedAnswers == null) {
+      return const SizedBox.shrink();
+    }
 
-                        fontSize: 16,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xffe5edfa),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Cabeçalho fixo
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Respostas detectadas:",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withValues(alpha: 0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                    // Botão Editar com visual de card
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.orange.withValues(alpha: 0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditAnswersScreen(
+                              studentName: widget.studentName,
+                              examName: widget.examName,
+                              answers: controller.extractedAnswers!,
+                              editedQuestions: controller.editedQuestions,
+                              numberOfQuestions: widget.numberOfQuestions,
+                              onAnswersUpdated: (updatedAnswers) {
+                                controller.updateExtractedAnswers(
+                                  updatedAnswers,
+                                );
+                              },
+                            ),
                           ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditAnswersScreen(
-                                  studentName: widget.studentName,
-                                  examName: widget.examName,
-                                  answers: controller.extractedAnswers!,
-                                  editedQuestions: controller.editedQuestions,
-                                  numberOfQuestions: widget.numberOfQuestions,
-                                  onAnswersUpdated: (updatedAnswers) {
-                                    controller.updateExtractedAnswers(
-                                      updatedAnswers,
-                                    );
-                                  },
-                                ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.edit, color: Colors.white, size: 18),
+                            SizedBox(width: 6),
+                            Text(
+                              "Editar",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
                               ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(Icons.edit, color: Colors.white, size: 18),
-                                SizedBox(width: 6),
-                                Text(
-                                  "Editar",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Chips das respostas
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: controller.extractedAnswers!.asMap().entries.map((
-                    entry,
-                  ) {
-                    final index = entry.key;
-                    final answer = entry.value;
-                    final isEdited = controller.editedQuestions[index];
-
-                    // Determinar a cor baseada no valor
-                    Color chipColor;
-                    String displayText;
-
-                    if (isEdited) {
-                      chipColor = Colors.orange[100]!; // Laranja se editado
-                    } else if (answer == null) {
-                      chipColor = Colors.orange.withValues(
-                        alpha: 0.3,
-                      ); // Laranja claro para null
-                    } else {
-                      chipColor = Colors.white10; // Branco se detectado
-                    }
-
-                    // Determinar o texto a ser exibido
-                    if (answer == null) {
-                      displayText = "?";
-                    } else if (answer == "Branco") {
-                      displayText = "∅";
-                    } else if (answer == "Marcação dupla") {
-                      displayText = "●●";
-                    } else {
-                      displayText = answer;
-                    }
-
-                    return Chip(
-                      label: Text("${index + 1}. $displayText"),
-                      backgroundColor: chipColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                    );
-                  }).toList(),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          
+          // Área rolável das respostas
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(12),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: controller.extractedAnswers!.asMap().entries.map((
+                  entry,
+                ) {
+                  final index = entry.key;
+                  final answer = entry.value;
+                  final isEdited = controller.editedQuestions[index];
 
-          Row(
-            children: [
-              // Botão Nova Captura
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Nova Captura"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff004aad),
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    controller.resetEditedFlags();
-                    controller.clear();
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
+                  Color chipColor;
+                  String displayText;
+                  
+                  if (isEdited) {
+                    chipColor = Colors.orange[100]!;
+                  } else if (answer == null) {
+                    chipColor = Colors.orange.withValues(alpha: 0.3);
+                  } else {
+                    chipColor = Colors.white10;
+                  }
+                  
+                  if (answer == null) {
+                    displayText = "?";
+                  } else if (answer == "Branco") {
+                    displayText = "B";
+                  } else if (answer == "Marcação dupla") {
+                    displayText = "!!";
+                  } else {
+                    displayText = answer;
+                  }
 
-              // Botão Confirmar
-              Expanded(
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.check),
-                  label: const Text("Confirmar"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    _confirmAnswers(controller.extractedAnswers!);
-                  },
-                ),
+                  return Chip(
+                    label: Text("${index + 1}. $displayText"),
+                    backgroundColor: chipColor,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                  );
+                }).toList(),
               ),
-            ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(AnswerSheetController controller) {
+    if (controller.extractedAnswers != null) {
+      return Row(
+        children: [
+          // Botão Nova Captura
+          Expanded(
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text("Nova Captura"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff004aad),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                controller.resetEditedFlags();
+                controller.clear();
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // Botão Confirmar
+          Expanded(
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.check),
+              label: const Text("Confirmar"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                _confirmAnswers(controller.extractedAnswers!);
+              },
+            ),
           ),
         ],
       );
@@ -447,27 +448,37 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
 
   void _confirmAnswers(List<String?> answers) async {
     final confirmationController = AnswerSheetConfirmationController();
-
-    // Verificar se todas as respostas foram identificadas
     final hasAllAnswers = confirmationController.checkAllAnswers(answers);
-
+    
     if (hasAllAnswers) {
-      // Cenário 1: Todas as respostas foram lidas
       final shouldReview = await confirmationController.showSuccessDialog(
         context,
         answers: answers,
         numberOfQuestions: widget.numberOfQuestions,
       );
-
+      
       if (shouldReview) {
         _navigateToReviewScreen(answers);
       }
     } else {
-      // Cenário 2: Faltam respostas - mostrar modal de aviso
-      await confirmationController.showMissingAnswersDialog(
+      final understood = await confirmationController.showMissingAnswersDialog(
         context,
         answers: answers,
       );
+      
+      if (understood && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Clique no botão "Editar" acima para corrigir as respostas manualmente',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -478,8 +489,8 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
         builder: (context) => ReviewAnswerSheetScreen(
           studentName: widget.studentName,
           examName: widget.examName,
-          numberOfQuestions: widget.numberOfQuestions,
           answers: answers,
+          numberOfQuestions: widget.numberOfQuestions,
         ),
       ),
     );
