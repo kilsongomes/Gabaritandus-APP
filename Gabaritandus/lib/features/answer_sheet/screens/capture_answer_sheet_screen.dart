@@ -444,49 +444,49 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     );
   }
 
- void _confirmAnswers(List<String?> answers) async {
-  final confirmationController = AnswerSheetConfirmationController();
-  
-  // Verificar se todas as respostas foram identificadas
-  final hasAllAnswers = confirmationController.checkAllAnswers(answers);
-  
-  if (hasAllAnswers) {
-    // Cenário 1: Todas as respostas foram lidas
-    final shouldReview = await confirmationController.showSuccessDialog(
-      context,
-      answers: answers,
-    );
-    
-    if (shouldReview) {
-      _navigateToReviewScreen(answers);
-    }
-  } else {
-    // Cenário 2: Faltam respostas - mostrar modal de aviso
-    final understood = await confirmationController.showMissingAnswersDialog(
-      context,
-      answers: answers,
-    );
-    
-    if (understood) {
-      // Usuário entendeu que faltam respostas e vai editar manualmente
-      // Fecha a tela atual? Ou apenas mostra onde editar?
-      // Vamos apenas mostrar um snackbar indicando onde editar
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Clique no botão "Editar" acima para corrigir as respostas manualmente',
-              style: TextStyle(color: Colors.white),
+  void _confirmAnswers(List<String?> answers) async {
+    final confirmationController = AnswerSheetConfirmationController();
+
+    // Verificar se todas as respostas foram identificadas
+    final hasAllAnswers = confirmationController.checkAllAnswers(answers);
+
+    if (hasAllAnswers) {
+      // Cenário 1: Todas as respostas foram lidas
+      final shouldReview = await confirmationController.showSuccessDialog(
+        context,
+        answers: answers,
+      );
+
+      if (shouldReview) {
+        _navigateToReviewScreen(answers);
+      }
+    } else {
+      // Cenário 2: Faltam respostas - mostrar modal de aviso
+      final understood = await confirmationController.showMissingAnswersDialog(
+        context,
+        answers: answers,
+      );
+
+      if (understood) {
+        // Usuário entendeu que faltam respostas e vai editar manualmente
+        // Fecha a tela atual? Ou apenas mostra onde editar?
+        // Vamos apenas mostrar um snackbar indicando onde editar
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Clique no botão "Editar" acima para corrigir as respostas manualmente',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
             ),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+          );
+        }
       }
     }
   }
-}
 
   void _showSuccessAndNavigateToReview(List<String?> answers) async {
     final confirmationController = AnswerSheetConfirmationController();
@@ -615,11 +615,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       } else {
         // Ainda faltam respostas, mostrar aviso novamente
         final shouldEditAgain = await confirmationController
-            .showMissingAnswersDialog(
-              context,
-              answers: editedAnswers,
-              
-            );
+            .showMissingAnswersDialog(context, answers: editedAnswers);
 
         if (shouldEditAgain == false) {
           // Usuário cancelou, voltar para tela anterior
@@ -632,17 +628,17 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
   }
 
   void _navigateToReviewScreen(List<String?> answers) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ReviewAnswerSheetScreen(
-        studentName: widget.studentName,
-        examName: widget.examName,
-        answers: answers,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ReviewAnswerSheetScreen(
+          studentName: widget.studentName,
+          examName: widget.examName,
+          answers: answers,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildStatRow(
     String label,
