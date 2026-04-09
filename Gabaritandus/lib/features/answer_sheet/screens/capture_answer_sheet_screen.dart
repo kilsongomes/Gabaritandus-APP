@@ -188,20 +188,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 100,
-              height: 100,
-              child: Image(
-                image: AssetImage('assets/images/processing.gif'),
-                fit: BoxFit.contain,
-              ),
-            ),
+          children: [            
             SizedBox(height: 16),
             CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text("Processando imagem..."),
-            SizedBox(height: 8),
+            SizedBox(height: 16),            
             Text(
               "Analisando respostas...",
               style: TextStyle(fontSize: 12, color: Colors.grey),
