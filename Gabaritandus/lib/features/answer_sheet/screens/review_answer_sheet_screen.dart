@@ -270,10 +270,10 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   String _getDisplayText(String? answer) {
     if (answer == null) {
       return "?";
-    } else if (answer == "Branco") {
-      return "B";
+    } else if (answer == "Em branco") {
+      return "∅";
     } else if (answer == "Marcação dupla") {
-      return "!!";
+      return "⊜";
     } else {
       return answer;
     }

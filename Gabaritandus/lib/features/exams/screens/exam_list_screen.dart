@@ -323,11 +323,8 @@ void initState() {
     final discipline = exam["discipline_name"] ?? "Disciplina não informada";
     final grade = exam["grade_name"] ?? "Ano não informado";
     final status = exam["status"] ?? "unknown";
-    final questionsList = exam["questions"] as List?;
-    final numberOfQuestions = questionsList?.length ?? 10;
 
-    print("📊 [ExamListScreen] Exame: $examName");
-    print("   Número de questões do exame: $numberOfQuestions");
+    
 
     // Cor do status
     Color statusColor = Colors.grey;

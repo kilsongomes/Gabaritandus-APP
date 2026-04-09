@@ -245,10 +245,10 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      if (selectedOption == "Branco") {
+                                      if (selectedOption == "Em branco") {
                                         _editedAnswers[index] = null;
                                       } else {
-                                        _editedAnswers[index] = "Branco";
+                                        _editedAnswers[index] = "Em branco";
                                       }
                                       _locallyEdited[index] = true;
                                     });
@@ -259,11 +259,11 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                       horizontal: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: selectedOption == "Branco"
+                                      color: selectedOption == "Em branco"
                                           ? Colors.grey[600]
                                           : Colors.grey[200],
                                       border: Border.all(
-                                        color: selectedOption == "Branco"
+                                        color: selectedOption == "Em branco"
                                             ? Colors.grey[600]!
                                             : Colors.grey[400]!,
                                         width: 2,
@@ -272,11 +272,11 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        "Branco",
+                                        "Em branco",
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: selectedOption == "Branco"
+                                          color: selectedOption == "Em branco"
                                               ? Colors.white
                                               : Colors.grey[600],
                                         ),

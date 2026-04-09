@@ -152,7 +152,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
 
                     // Área da imagem com altura flexível
                     Flexible(
-                      flex: 3,
+                      flex: 4,
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -382,10 +382,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
 
                     if (answer == null) {
                       displayText = "?";
-                    } else if (answer == "Branco") {
+                    } else if (answer == "Em branco") {
                       displayText = "∅";
                     } else if (answer == "Marcação dupla") {
-                      displayText = "••";
+                      displayText = "⊜";
                     } else {
                       displayText = answer;
                     }
