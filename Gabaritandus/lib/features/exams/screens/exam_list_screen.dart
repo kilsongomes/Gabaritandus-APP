@@ -350,6 +350,7 @@ void initState() {
     }
 
     return Card(
+      color: Color(0xffe5edfa),
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: const Icon(Icons.description, color: Colors.grey),
