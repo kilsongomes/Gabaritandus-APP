@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -60,7 +61,7 @@ class AnswerSheetController extends ChangeNotifier {
             examName: examName,
             studentId: studentId,
             examId: examId,
-            numberOfQuestions: numberOfQuestions
+            numberOfQuestions: numberOfQuestions,
           ),
         ),
       );
@@ -144,6 +145,22 @@ class AnswerSheetController extends ChangeNotifier {
       // Processar com o reader, passando o número de questões
       if (_currentNumberOfQuestions == null) {
         throw Exception("Número de questões não definido");
+      }
+
+      if (kIsWeb) {
+        final bytes = await image.readAsBytes();
+
+        _extractedAnswers = await _reader.processAnswerSheet(
+          bytes,
+          _currentNumberOfQuestions!,
+        );
+      } else {
+        final imageFile = File(image.path);
+
+        _extractedAnswers = await _reader.processAnswerSheet(
+          imageFile,
+          _currentNumberOfQuestions!,
+        );
       }
 
       _extractedAnswers = await _reader.processAnswerSheet(
