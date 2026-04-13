@@ -205,16 +205,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: kIsWeb
-            ? FutureBuilder(
-                future: controller.capturedImage!.readAsBytes(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  return Image.memory(snapshot.data!, fit: BoxFit.contain);
-                },
-              )
+            ? Image.network(controller.capturedImage!.path, fit: BoxFit.contain)
             : Image.file(
                 File(controller.capturedImage!.path),
                 fit: BoxFit.contain,
