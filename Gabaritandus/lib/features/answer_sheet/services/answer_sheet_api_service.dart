@@ -3,6 +3,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import '../controller/api_config.dart';
+import 'package:http_parser/http_parser.dart';
 
 class AnswerSheetApiService {
   static final String baseUrl = ApiConfig.baseUrl;
@@ -40,21 +41,21 @@ class AnswerSheetApiService {
 
       // 🔥 PARTE MAIS IMPORTANTE
       if (kIsWeb) {
-        print("🌐 Upload via WEB (bytes)");
-
         request.files.add(
           http.MultipartFile.fromBytes(
             'file',
             imageFile,
             filename: 'answer_sheet.jpg',
-            contentType: MediaType('image', 'jpeg'),
+            contentType: MediaType('image', 'jpeg'), // 👈 ESSENCIAL
           ),
         );
       } else {
-        print("📱 Upload via MOBILE (path)");
-
         request.files.add(
-          await http.MultipartFile.fromPath('file', imageFile.path),
+          await http.MultipartFile.fromPath(
+            'file',
+            imageFile.path,
+            contentType: MediaType('image', 'jpeg'),
+          ),
         );
       }
 
