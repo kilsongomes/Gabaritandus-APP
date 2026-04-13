@@ -138,16 +138,12 @@ class AnswerSheetController extends ChangeNotifier {
     try {
       print("⚙️ [AnswerSheetController] Processando imagem...");
 
-      // Converter XFile para File
-      final File imageFile = File(image.path);
-
-      // Processar com o reader
-      // Processar com o reader, passando o número de questões
       if (_currentNumberOfQuestions == null) {
         throw Exception("Número de questões não definido");
       }
 
       if (kIsWeb) {
+        // 🌐 WEB → usar bytes
         final bytes = await image.readAsBytes();
 
         _extractedAnswers = await _reader.processAnswerSheet(
@@ -155,20 +151,15 @@ class AnswerSheetController extends ChangeNotifier {
           _currentNumberOfQuestions!,
         );
       } else {
-        final imageFile = File(image.path);
+        // 📱 MOBILE → usar File
+        final file = File(image.path);
 
         _extractedAnswers = await _reader.processAnswerSheet(
-          imageFile,
+          file,
           _currentNumberOfQuestions!,
         );
       }
 
-      _extractedAnswers = await _reader.processAnswerSheet(
-        imageFile,
-        _currentNumberOfQuestions!,
-      );
-
-      // Ajustar a lista de questões editadas para o número correto
       _editedQuestions = List.filled(_extractedAnswers!.length, false);
 
       print("✅ [AnswerSheetController] Processamento concluído");
