@@ -155,21 +155,20 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
 }) async {
   final answeredCount = answers.where((a) => a != null).length;
   final totalCount = answers.length;
-  final alternativesCount = numberOfQuestions == 20 ? 5 : 4;
+  
   
   return await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
       title: const Row(
-        children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 28),
-          SizedBox(width: 8),
-          Text(
-            "Gabarito Completo!",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
+        children: [          
+          Center(
+            child: Text(
+              "Gabarito Completo!",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,              
+              ),
             ),
           ),
         ],
@@ -177,64 +176,45 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Todas as $totalCount questões foram identificadas com sucesso!",
-            style: const TextStyle(fontSize: 16),
-          ),
+        children: [          
           const SizedBox(height: 8),
-          Text(
-            "($alternativesCount alternativas por questão)",
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.green[50],
+              color: Colors.blue[50],
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green[200]!),
+              border: Border.all(color: Colors.blue[200]!),
             ),
             child: Row(
               children: [
-                Icon(Icons.verified, color: Colors.green[700], size: 24),
-                const SizedBox(width: 12),
+                Icon(Icons.verified, color: Color(0xFF004aad), size: 24),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     "$answeredCount de $totalCount respostas detectadas corretamente",
                     style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.green[800],
+                      fontSize: 14,                      
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            "Deseja revisar o gabarito antes de finalizar?",
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
+          ),                    
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context, false);
-          },
-          child: const Text("Voltar"),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context, true);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
+      actions: [        
+        Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF004aad),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text("Revisar Gabarito"),
           ),
-          child: const Text("Revisar Gabarito"),
         ),
       ],
     ),
