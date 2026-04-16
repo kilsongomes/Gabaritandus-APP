@@ -264,35 +264,47 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   }
 
   void _confirmAndFinish(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Confirmar Gabarito"),
-        content: const Text(
-          "Tem certeza que deseja finalizar e enviar este gabarito?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Fecha dialog
-              // TO DO: Enviar para API
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Gabarito enviado com sucesso!"),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text("Confirmar"),
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Impede fechar tocando fora
+    builder: (context) => AlertDialog(
+      title: const Row(
+        children: [          
+          SizedBox(width: 8),
+          Text(
+            "Lançamento finalizado!",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
-    );
-  }
+      content: Text(
+        "Gabarito de \"$studentName\" registrado.",
+        style: const TextStyle(fontSize: 16),
+      ),
+      actions: [
+        Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Fecha o dialog
+              // Navegar para a tela inicial ou voltar
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff004aad),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+            ),
+            child: const Text(
+              "OK",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
