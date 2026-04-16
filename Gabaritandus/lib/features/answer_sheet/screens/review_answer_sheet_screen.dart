@@ -17,29 +17,12 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determinar quantas alternativas baseado no número de questões
-    final int alternativesCount = numberOfQuestions == 20 ? 5 : 4;
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text("Revisar Gabarito"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
-        actions: [
-          TextButton(
-            onPressed: () {
-              _confirmAndFinish(context);
-            },
-            child: const Text(
-              "FINALIZAR",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
+        // Botão FINALIZAR removido da AppBar
       ),
       body: Column(
         children: [
@@ -87,37 +70,20 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      "$numberOfQuestions questões • $alternativesCount alternativas",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  Container(padding: const EdgeInsets.symmetric()),
                 ],
               ),
             ),
           ),
-          
+
           // Resumo estatístico
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildSummaryCard(),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Lista de respostas para revisão
           Expanded(
             child: ListView.builder(
@@ -127,7 +93,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                 final questionNumber = index + 1;
                 final answer = answers[index];
                 final displayText = _getDisplayText(answer);
-                
+
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
@@ -150,10 +116,13 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: answer == null
                             ? Colors.orange.withValues(alpha: 0.3)
-                            : Colors.green.withValues(alpha: 0.1),
+                            : Colors
+                                  .grey[200]!,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: answer == null ? Colors.orange : Colors.green,
+                          color: answer == null
+                              ? Colors.orange
+                              : Colors.grey[400]!, 
                         ),
                       ),
                       child: Text(
@@ -161,7 +130,10 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: answer == null ? Colors.orange[800] : Colors.green[800],
+                          color: answer == null
+                              ? Colors.orange[800]
+                              : Colors
+                                    .grey[700], 
                         ),
                       ),
                     ),
@@ -170,36 +142,57 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
               },
             ),
           ),
-          
-          // Botão Editar
+
+          // Botões: Editar e Finalizar 
           Padding(
             padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.edit),
-                label: const Text("Editar Respostas"),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                // Botão Editar Respostas (Outlined)
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.edit),
+                    label: const Text("Editar Respostas"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor:  Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      // Voltar para edição
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-                onPressed: () {
-                  // Voltar para edição
-                  Navigator.pop(context);
-                },
-              ),
+                const SizedBox(width: 12),
+                // Botão Finalizar (Elevated, verde)
+                Expanded(
+                  child: ElevatedButton.icon(
+                    label: const Text("FINALIZAR"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      _confirmAndFinish(context);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildSummaryCard() {
     final answered = answers.where((a) => a != null).length;
     final total = answers.length;
-    final blankAnswers = answers.where((a) => a == "Branco").length;
+    final blankAnswers = answers.where((a) => a == "Em branco").length;
     final doubleMarks = answers.where((a) => a == "Marcação dupla").length;
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -214,24 +207,16 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
             "Identificadas",
             "$answered/$total",
             Icons.check_circle,
-            Colors.green,
+            Color(0xFF004aad),
           ),
-          Container(
-            width: 1,
-            height: 30,
-            color: Colors.grey[300],
-          ),
+          Container(width: 1, height: 30, color: Colors.grey[300]),
           _buildStatItem(
             "Branco",
             blankAnswers.toString(),
             Icons.radio_button_unchecked,
             Colors.blue,
           ),
-          Container(
-            width: 1,
-            height: 30,
-            color: Colors.grey[300],
-          ),
+          Container(width: 1, height: 30, color: Colors.grey[300]),
           _buildStatItem(
             "Marc. Dupla",
             doubleMarks.toString(),
@@ -242,8 +227,13 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
+
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         Icon(icon, size: 20, color: color),
@@ -256,17 +246,11 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
             color: color,
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
       ],
     );
   }
-  
+
   String _getDisplayText(String? answer) {
     if (answer == null) {
       return "?";
@@ -278,7 +262,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
       return answer;
     }
   }
-  
+
   void _confirmAndFinish(BuildContext context) {
     showDialog(
       context: context,
@@ -295,7 +279,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Fecha dialog
-              // TODO: Enviar para API
+              // TO DO: Enviar para API
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text("Gabarito enviado com sucesso!"),
@@ -304,9 +288,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
               );
               Navigator.popUntil(context, (route) => route.isFirst);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
             child: const Text("Confirmar"),
           ),
         ],
