@@ -116,13 +116,12 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: answer == null
                             ? Colors.orange.withValues(alpha: 0.3)
-                            : Colors
-                                  .grey[200]!,
+                            : Colors.grey[200]!,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: answer == null
                               ? Colors.orange
-                              : Colors.grey[400]!, 
+                              : Colors.grey[400]!,
                         ),
                       ),
                       child: Text(
@@ -132,8 +131,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: answer == null
                               ? Colors.orange[800]
-                              : Colors
-                                    .grey[700], 
+                              : Colors.grey[700],
                         ),
                       ),
                     ),
@@ -143,7 +141,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
             ),
           ),
 
-          // Botões: Editar e Finalizar 
+          // Botões: Editar e Finalizar
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -155,7 +153,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                     label: const Text("Editar Respostas"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
-                      foregroundColor:  Colors.white,
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     onPressed: () {
@@ -264,15 +262,16 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   }
 
   void _confirmAndFinish(BuildContext context) {
-  showDialog(
+    showDialog(
     context: context,
-    barrierDismissible: false, // Impede fechar tocando fora
+    barrierDismissible: false,
     builder: (context) => AlertDialog(
       title: const Row(
-        children: [          
+        children: [
+          Icon(Icons.check_circle, color: Colors.green, size: 28),
           SizedBox(width: 8),
           Text(
-            "Lançamento finalizado!",
+            "Gabarito finalizado!",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -289,8 +288,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Fecha o dialog
-              // Navegar para a tela inicial ou voltar
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pop(context, true); // Retorna true para a CaptureScreen
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff004aad),
@@ -306,5 +304,5 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
       ],
     ),
   );
-}
+  }
 }

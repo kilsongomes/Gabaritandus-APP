@@ -188,10 +188,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [            
+          children: [
             SizedBox(height: 16),
             CircularProgressIndicator(),
-            SizedBox(height: 16),            
+            SizedBox(height: 16),
             Text(
               "Analisando respostas...",
               style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -491,8 +491,8 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     }
   }
 
-  void _navigateToReviewScreen(List<String?> answers) {
-    Navigator.push(
+  void _navigateToReviewScreen(List<String?> answers) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ReviewAnswerSheetScreen(
@@ -503,5 +503,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
         ),
       ),
     );
+
+    // Se finalizou com sucesso, volta para a lista de alunos
+    if (result == true && mounted) {
+      Navigator.pop(context, true); // Volta para ExamStudentsScreen
+    }
   }
 }

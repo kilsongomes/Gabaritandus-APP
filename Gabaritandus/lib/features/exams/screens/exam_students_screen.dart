@@ -10,7 +10,6 @@ class ExamStudentsScreen extends StatefulWidget {
   final int groupId;
   final String examGrade;
   final String disciplineName;
-  
 
   const ExamStudentsScreen({
     super.key,
@@ -19,7 +18,6 @@ class ExamStudentsScreen extends StatefulWidget {
     required this.groupId,
     required this.examGrade,
     required this.disciplineName,
-    
   });
 
   @override
@@ -83,8 +81,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     });
   }
 
-  void _navigateToCaptureScreen(String studentName, dynamic studentId) {
-
+  void _navigateToCaptureScreen(String studentName, dynamic studentId) async {
     final controller = Provider.of<ExamController>(context, listen: false);
     final exam = controller.currentExam;
     final questions = exam?["questions"] as List?;
@@ -95,7 +92,7 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
     print("   examName: ${widget.examName}");
     print("   numberOfQuestions: ${numberOfQuestions}");
 
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CaptureAnswerSheetScreen(
@@ -108,6 +105,10 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
         ),
       ),
     );
+
+    if (mounted) {
+      await controller.loadExamDetails(widget.examId);
+    }
   }
 
   @override

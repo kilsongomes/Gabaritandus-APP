@@ -348,16 +348,6 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
   void _saveChanges() {
     // Chamar o callback com as respostas editadas
     widget.onAnswersUpdated(_editedAnswers);
-    
-    // Mostrar mensagem de sucesso
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Respostas salvas com sucesso!"),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-
     // Voltar para tela anterior
     Navigator.pop(context);
   }
