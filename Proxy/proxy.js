@@ -36,8 +36,8 @@ app.use(
     })
 );
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
     console.log("🚀 Proxy rodando:");
-    console.log("👉 API: http://localhost:3000/api");
-    console.log("👉 OMR: http://localhost:3000/omr");
+    console.log("👉 API: http://SEU_IP:3000/api");
+    console.log("👉 OMR: http://SEU_IP:3000/omr");
 });
