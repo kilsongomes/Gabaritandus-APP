@@ -49,6 +49,10 @@ class AnswerSheetController extends ChangeNotifier {
     _currentExamId = examId;
     _currentNumberOfQuestions = numberOfQuestions;
 
+    print("📷 [AnswerSheetController] Abrindo câmera com overlay...");
+    print("   📊 Número de questões informado: $numberOfQuestions");
+    print("   📚 Nome do exame: $examName");
+
     try {
       print("📷 [AnswerSheetController] Abrindo câmera com overlay...");
 

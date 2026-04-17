@@ -5,12 +5,14 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   final String studentName;
   final String examName;
   final List<String?> answers;
+  final int numberOfQuestions; // Adicionado
 
   const ReviewAnswerSheetScreen({
     super.key,
     required this.studentName,
     required this.examName,
     required this.answers,
+    required this.numberOfQuestions,
   });
 
   @override
@@ -20,22 +22,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
         title: const Text("Revisar Gabarito"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
-        actions: [
-          TextButton(
-            onPressed: () {
-              // TODO: Implementar confirmação final
-              _confirmAndFinish(context);
-            },
-            child: const Text(
-              "FINALIZAR",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
+        // Botão FINALIZAR removido da AppBar
       ),
       body: Column(
         children: [
@@ -82,11 +69,21 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Container(padding: const EdgeInsets.symmetric()),
                 ],
               ),
             ),
           ),
-          
+
+          // Resumo estatístico
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildSummaryCard(),
+          ),
+
+          const SizedBox(height: 16),
+
           // Lista de respostas para revisão
           Expanded(
             child: ListView.builder(
@@ -96,7 +93,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                 final questionNumber = index + 1;
                 final answer = answers[index];
                 final displayText = _getDisplayText(answer);
-                
+
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
@@ -119,10 +116,12 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: answer == null
                             ? Colors.orange.withValues(alpha: 0.3)
-                            : Colors.green.withValues(alpha: 0.1),
+                            : Colors.grey[200]!,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: answer == null ? Colors.orange : Colors.green,
+                          color: answer == null
+                              ? Colors.orange
+                              : Colors.grey[400]!,
                         ),
                       ),
                       child: Text(
@@ -130,7 +129,9 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: answer == null ? Colors.orange[800] : Colors.green[800],
+                          color: answer == null
+                              ? Colors.orange[800]
+                              : Colors.grey[700],
                         ),
                       ),
                     ),
@@ -139,74 +140,169 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
               },
             ),
           ),
-          
-          // Botão Editar
+
+          // Botões: Editar e Finalizar
           Padding(
             padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.edit),
-                label: const Text("Editar Respostas"),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                // Botão Editar Respostas (Outlined)
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.edit),
+                    label: const Text("Editar Respostas"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      // Voltar para edição
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-                onPressed: () {
-                  // Voltar para edição
-                  Navigator.pop(context);
-                },
-              ),
+                const SizedBox(width: 12),
+                // Botão Finalizar (Elevated, verde)
+                Expanded(
+                  child: ElevatedButton.icon(
+                    label: const Text("FINALIZAR"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      _confirmAndFinish(context);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-  
+
+  Widget _buildSummaryCard() {
+    final answered = answers.where((a) => a != null).length;
+    final total = answers.length;
+    final blankAnswers = answers.where((a) => a == "Em branco").length;
+    final doubleMarks = answers.where((a) => a == "Marcação dupla").length;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem(
+            "Identificadas",
+            "$answered/$total",
+            Icons.check_circle,
+            Color(0xFF004aad),
+          ),
+          Container(width: 1, height: 30, color: Colors.grey[300]),
+          _buildStatItem(
+            "Branco",
+            blankAnswers.toString(),
+            Icons.radio_button_unchecked,
+            Colors.blue,
+          ),
+          Container(width: 1, height: 30, color: Colors.grey[300]),
+          _buildStatItem(
+            "Marc. Dupla",
+            doubleMarks.toString(),
+            Icons.change_circle,
+            Colors.purple,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: color),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+      ],
+    );
+  }
+
   String _getDisplayText(String? answer) {
     if (answer == null) {
       return "?";
-    } else if (answer == "Branco") {
-      return "B";
+    } else if (answer == "Em branco") {
+      return "∅";
     } else if (answer == "Marcação dupla") {
-      return "!!";
+      return "⊜";
     } else {
       return answer;
     }
   }
-  
+
   void _confirmAndFinish(BuildContext context) {
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Confirmar Gabarito"),
-        content: const Text(
-          "Tem certeza que deseja finalizar e enviar este gabarito?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Fecha dialog
-              // TODO: Enviar para API
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Gabarito enviado com sucesso!"),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.check_circle, color: Colors.green, size: 28),
+          SizedBox(width: 8),
+          Text(
+            "Gabarito finalizado!",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            child: const Text("Confirmar"),
           ),
         ],
       ),
-    );
+      content: Text(
+        "Gabarito de \"$studentName\" registrado.",
+        style: const TextStyle(fontSize: 16),
+      ),
+      actions: [
+        Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Fecha o dialog
+              Navigator.pop(context, true); // Retorna true para a CaptureScreen
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff004aad),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+            ),
+            child: const Text(
+              "OK",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
   }
 }

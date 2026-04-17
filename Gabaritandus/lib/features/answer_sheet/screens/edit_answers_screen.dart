@@ -6,6 +6,7 @@ class EditAnswersScreen extends StatefulWidget {
   final String examName;
   final List<String?> answers;
   final List<bool> editedQuestions;
+  final int numberOfQuestions;
   final Function(List<String?>) onAnswersUpdated;
 
   const EditAnswersScreen({
@@ -14,6 +15,7 @@ class EditAnswersScreen extends StatefulWidget {
     required this.examName,
     required this.answers,
     required this.editedQuestions,
+    required this.numberOfQuestions,
     required this.onAnswersUpdated,
   });
 
@@ -24,15 +26,22 @@ class EditAnswersScreen extends StatefulWidget {
 class _EditAnswersScreenState extends State<EditAnswersScreen> {
   late List<String?> _editedAnswers;
   late List<bool> _locallyEdited;
-  static const List<String> options = ['A', 'B', 'C', 'D'];
+  late List<String> options;
 
   @override
   void initState() {
     super.initState();
+    // Definir opções baseado no número de questões
+    if (widget.numberOfQuestions == 20) {
+      options = ['A', 'B', 'C', 'D', 'E'];
+    } else {
+      options = ['A', 'B', 'C', 'D'];
+    }
+    
     // Copiar as respostas para edição
     _editedAnswers = List.from(widget.answers);
     _locallyEdited = List.from(widget.editedQuestions);
-  }
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +50,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
         title: const Text("Editar Respostas"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
+        // 🔥 Botão Salvar removido da AppBar
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -88,53 +98,51 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ),                                       
                   ],
                 ),
               ),
             ),
-
+            
             const SizedBox(height: 20),
 
-            // Lista de questões
+            // Lista de questões com botão no final
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.zero,
-                // Adicionamos +1 para o botão ao final
-                itemCount: _editedAnswers.length + 1,
+                itemCount: _editedAnswers.length + 1, // +1 para o botão
                 itemBuilder: (context, index) {
-                  // Se for o último índice, retornamos o botão de salvar
+                  // Se for o último item, mostrar o botão Salvar
                   if (index == _editedAnswers.length) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24.0),
-                      child: ElevatedButton(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: ElevatedButton.icon(
                         onPressed: _saveChanges,
+                        icon: const Icon(Icons.save, color: Colors.white),
+                        label: const Text(
+                          "SALVAR ALTERAÇÕES",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff004aad),
-                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          "SALVAR",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                       ),
                     );
                   }
-
-                  // Caso contrário, renderiza o Card da questão normalmente
+                  
                   final questionNumber = index + 1;
                   final selectedOption = _editedAnswers[index];
-                  final wasEdited = _locallyEdited[index];
+                  final wasEdited = _locallyEdited[index];                  
 
                   return Card(
-                    color: Colors.white70,
                     margin: const EdgeInsets.only(bottom: 12),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -149,9 +157,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: wasEdited
-                                      ? Colors.orange
-                                      : Colors.black,
+                                  color: wasEdited ? Colors.orange : Colors.black,
                                 ),
                               ),
                               if (wasEdited) ...[
@@ -177,54 +183,51 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                               ],
                             ],
                           ),
-                          const SizedBox(height: 16),
-
-                          // Opções A, B, C, D (círculos ocupando todo o espaço)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          const SizedBox(height: 16),                         
+          
+                          // Opções A, B, C, D, E (círculos)
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.center,
                             children: options.map((option) {
                               final isSelected = selectedOption == option;
 
-                              return Expanded(
-                                child: Center(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        // Se clicar na mesma opção, desmarca
-                                        if (isSelected) {
-                                          _editedAnswers[index] = null;
-                                        } else {
-                                          _editedAnswers[index] = option;
-                                        }
-                                        _locallyEdited[index] = true;
-                                      });
-                                    },
-                                    child: Container(
-                                      width: 60,
-                                      height: 60,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (isSelected) {
+                                      _editedAnswers[index] = null;
+                                    } else {
+                                      _editedAnswers[index] = option;
+                                    }
+                                    _locallyEdited[index] = true;
+                                  });
+                                },
+                                child: Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isSelected
+                                        ? Colors.grey[600]
+                                        : Colors.grey[200],
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Colors.grey[600]!
+                                          : Colors.grey[400]!,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      option,
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
                                         color: isSelected
-                                            ? Colors.grey[600]
-                                            : Colors.grey[200],
-                                        border: Border.all(
-                                          color: isSelected
-                                              ? Colors.grey[600]!
-                                              : Colors.grey[400]!,
-                                          width: 2,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          option,
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            color: isSelected
-                                                ? Colors.white
-                                                : Colors.grey[600],
-                                          ),
-                                        ),
+                                            ? Colors.white
+                                            : Colors.grey[600],
                                       ),
                                     ),
                                   ),
@@ -232,20 +235,20 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                               );
                             }).toList(),
                           ),
-
+                          
                           const SizedBox(height: 20),
-
-                          // Botões Branco e Marcação Dupla na parte inferior (retangulares)
+                          
+                          // Botões Branco e Marcação Dupla (sem símbolos internos)
                           Row(
                             children: [
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      if (selectedOption == "Branco") {
+                                      if (selectedOption == "Em branco") {
                                         _editedAnswers[index] = null;
                                       } else {
-                                        _editedAnswers[index] = "Branco";
+                                        _editedAnswers[index] = "Em branco";
                                       }
                                       _locallyEdited[index] = true;
                                     });
@@ -256,11 +259,11 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                       horizontal: 8,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: selectedOption == "Branco"
+                                      color: selectedOption == "Em branco"
                                           ? Colors.grey[600]
                                           : Colors.grey[200],
                                       border: Border.all(
-                                        color: selectedOption == "Branco"
+                                        color: selectedOption == "Em branco"
                                             ? Colors.grey[600]!
                                             : Colors.grey[400]!,
                                         width: 2,
@@ -269,11 +272,11 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        "Branco",
+                                        "Em branco",
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: selectedOption == "Branco"
+                                          color: selectedOption == "Em branco"
                                               ? Colors.white
                                               : Colors.grey[600],
                                         ),
@@ -290,8 +293,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                       if (selectedOption == "Marcação dupla") {
                                         _editedAnswers[index] = null;
                                       } else {
-                                        _editedAnswers[index] =
-                                            "Marcação dupla";
+                                        _editedAnswers[index] = "Marcação dupla";
                                       }
                                       _locallyEdited[index] = true;
                                     });
@@ -306,8 +308,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                           ? Colors.grey[600]
                                           : Colors.grey[200],
                                       border: Border.all(
-                                        color:
-                                            selectedOption == "Marcação dupla"
+                                        color: selectedOption == "Marcação dupla"
                                             ? Colors.grey[600]!
                                             : Colors.grey[400]!,
                                         width: 2,
@@ -320,8 +321,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color:
-                                              selectedOption == "Marcação dupla"
+                                          color: selectedOption == "Marcação dupla"
                                               ? Colors.white
                                               : Colors.grey[600],
                                         ),
@@ -348,7 +348,6 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
   void _saveChanges() {
     // Chamar o callback com as respostas editadas
     widget.onAnswersUpdated(_editedAnswers);
-
     // Voltar para tela anterior
     Navigator.pop(context);
   }

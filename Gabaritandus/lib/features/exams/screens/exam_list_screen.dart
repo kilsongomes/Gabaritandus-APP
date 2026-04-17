@@ -323,6 +323,7 @@ void initState() {
     final discipline = exam["discipline_name"] ?? "Disciplina não informada";
     final grade = exam["grade_name"] ?? "Ano não informado";
     final status = exam["status"] ?? "unknown";
+
     
 
     // Cor do status
@@ -349,6 +350,7 @@ void initState() {
     }
 
     return Card(
+      color: Color(0xffe5edfa),
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: const Icon(Icons.description, color: Colors.grey),
@@ -394,8 +396,7 @@ void initState() {
               "examName": examName,
               "groupId": exam["group_id"] ?? 0,
               "examGrade": grade,
-              "disciplineName": discipline,
-              "numberOfQuestions": exam["number_of_questions"] ?? 10,
+              "disciplineName": discipline,              
             },
           );
         },
