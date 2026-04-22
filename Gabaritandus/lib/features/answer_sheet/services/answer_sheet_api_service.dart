@@ -1,13 +1,10 @@
+// answer_sheet_api_service.dart
 import 'dart:convert';
-import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
-import '../controller/api_config.dart';
-import 'package:http_parser/http_parser.dart';
+import '../../../config.dart'; // 🔥 Importa a configuração centralizada
 
 class AnswerSheetApiService {
-  static final String baseUrl = ApiConfig.baseUrl;
-
   Future<List<String?>> processAnswerSheet(
     dynamic imageFile,
     int numberOfQuestions,
@@ -15,7 +12,7 @@ class AnswerSheetApiService {
     try {
       print("📤 [AnswerSheetApiService] Enviando imagem para API...");
       print("   Número de questões: $numberOfQuestions");
-      print("   Base URL: $baseUrl");
+      print("   Base URL: $omrApiUrl"); // 🔥 Usa a URL do config.dart
 
       // 🔥 Validação importante
       if (kIsWeb && imageFile is! Uint8List) {
@@ -26,13 +23,17 @@ class AnswerSheetApiService {
         throw Exception("Imagem inválida");
       }
 
-      // Escolher endpoint
+      // Escolher endpoint baseado no número de questões
       final endpoint = numberOfQuestions == 20
           ? "/processar_20_questoes"
           : "/processar_10_questoes";
-          
-      print("   📍 Usando endpoint: $endpoint (baseado em $numberOfQuestions questões)");
-      final uri = Uri.parse("$baseUrl$endpoint");
+
+      print(
+        "   📍 Usando endpoint: $endpoint (baseado em $numberOfQuestions questões)",
+      );
+
+      // 🔥 Usa a URL do config.dart
+      final uri = Uri.parse("$omrApiUrl$endpoint");
 
       print("   URL: $uri");
 
@@ -40,14 +41,14 @@ class AnswerSheetApiService {
 
       request.headers.addAll({"Accept": "application/json"});
 
-      // 🔥 PARTE MAIS IMPORTANTE
+      // 🔥 Parte mais importante - anexar a imagem
       if (kIsWeb) {
         request.files.add(
           http.MultipartFile.fromBytes(
             'file',
             imageFile,
             filename: 'answer_sheet.jpg',
-            contentType: MediaType('image', 'jpeg'), // 👈 ESSENCIAL
+            contentType: http.MediaType('image', 'jpeg'),
           ),
         );
       } else {
@@ -55,7 +56,7 @@ class AnswerSheetApiService {
           await http.MultipartFile.fromPath(
             'file',
             imageFile.path,
-            contentType: MediaType('image', 'jpeg'),
+            contentType: http.MediaType('image', 'jpeg'),
           ),
         );
       }
@@ -63,11 +64,12 @@ class AnswerSheetApiService {
       print("   Enviando requisição...");
 
       final response = await request.send();
-
       final responseBody = await response.stream.bytesToString();
 
       print("⬅️ Status Code: ${response.statusCode}");
-      print("⬅️ Response Body: $responseBody");
+      print(
+        "⬅️ Response Body: ${responseBody.substring(0, responseBody.length > 200 ? 200 : responseBody.length)}...",
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
@@ -98,6 +100,7 @@ class AnswerSheetApiService {
           print(
             "   Total respondidas: ${extractedAnswers.where((a) => a != null).length}",
           );
+          print("   Respostas: $extractedAnswers");
 
           return extractedAnswers;
         } else {
@@ -115,11 +118,12 @@ class AnswerSheetApiService {
 
   Future<bool> testConnection() async {
     try {
-      print("🔌 Testando conexão...");
+      print("🔌 Testando conexão com a API OMR...");
+      print("   URL: $omrApiUrl"); // 🔥 Usa a URL do config.dart
 
-      final response = await http.get(Uri.parse("$baseUrl/"));
+      final response = await http.get(Uri.parse("$omrApiUrl/"));
 
-      print("Status: ${response.statusCode}");
+      print("   Status: ${response.statusCode}");
 
       return response.statusCode == 200;
     } catch (e) {

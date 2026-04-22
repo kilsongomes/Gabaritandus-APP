@@ -1,15 +1,10 @@
-// exam_service.dart - WEB VERSION
+// exam_service.dart
 import 'dart:convert';
-import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
+import '../../../config.dart'; // 🔥 Importa a configuração centralizada
 
 class ExamService {
-  static String baseUrl = kIsWeb
-      ? "http://localhost:3000/api"
-      : "https://adrbackend.educandus.com.br";
-
   Future<int?> _getGroupId() async {
     final prefs = await SharedPreferences.getInstance();
     final groupId = prefs.getInt("group_id");
@@ -70,13 +65,16 @@ class ExamService {
         throw Exception("Token de autenticação não disponível");
       }
 
+      // 🔥 Usa a URL do config.dart
       final url = Uri.parse(
-        "$baseUrl/exam/list-exams-by-group-id/$groupId?page=0&pageSize=100&sortBy=name&sortOrder=desc",
+        "$mainApiUrl/exam/list-exams-by-group-id/$groupId?page=0&pageSize=100&sortBy=name&sortOrder=desc",
       );
 
       print("➡️ [ExamService] Buscando exames para group_id: $groupId");
       print("URL: $url");
-      print("Token: ${token.substring(0, min(20, token.length))}...");
+      print(
+        "Token: ${token.substring(0, token.length > 20 ? 20 : token.length)}...",
+      );
 
       final response = await http.get(
         url,
@@ -121,7 +119,6 @@ class ExamService {
       }
     } catch (e) {
       print("❌ [ExamService] Erro ao buscar exames: $e");
-      print("Stack trace: ${e.toString()}");
       rethrow;
     }
   }
@@ -151,8 +148,9 @@ class ExamService {
         );
       }
 
+      // 🔥 Usa a URL do config.dart
       final url = Uri.parse(
-        "$baseUrl/user/list-users-by-exam-schedules/$examId?pageSize=100&groupId=$groupId&page=0&regionId=${regionId ?? 14}&schoolId=${schoolId ?? 7558}",
+        "$mainApiUrl/user/list-users-by-exam-schedules/$examId?pageSize=100&groupId=$groupId&page=0&regionId=${regionId ?? 14}&schoolId=${schoolId ?? 7558}",
       );
 
       print("➡️ [ExamService] Buscando detalhes do exame: $examId");

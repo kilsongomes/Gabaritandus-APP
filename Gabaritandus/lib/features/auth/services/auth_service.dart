@@ -1,16 +1,17 @@
+// auth_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../config.dart';
 
 class AuthService {
-  static const String loginUrl = "https://back.educandus.com.br/api/login";
-
   Future<String?> login(String username, String password) async {
     try {
-      print("➡️ POST $loginUrl");
+      final url = Uri.parse(loginApiUrl);
+      print("➡️ POST $url");
 
       final response = await http.post(
-        Uri.parse(loginUrl),
+        url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"username": username, "password": password}),
       );
@@ -19,23 +20,14 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-
         if (json["success"] == true) {
           final data = json["data"];
-
-          // 🔐 TOKEN
           final token = data["token"];
-
-          // 💾 SALVAR TUDO DE UMA VEZ
           await _saveUserData(data, token);
-
-          print("✅ Login completo (SEM /user/me)");
-
+          print("✅ Login completo");
           return data["user"]["id"].toString();
         }
       }
-
-      print("❌ Login falhou");
       return null;
     } catch (e) {
       print("❌ Erro login: $e");
@@ -48,53 +40,50 @@ class AuthService {
 
     final user = data["user"];
     final roles = data["user_role"] ?? [];
-
     final role = roles.isNotEmpty ? roles[0] : {};
 
     final userName = user["name"] ?? user["username"] ?? "";
     final userPhoto = user["photo"] ?? "";
-
     final roleName = role["role_name"] ?? "";
     final groupName = role["group_name"] ?? "";
     final regionName = role["region_name"] ?? "";
     final schoolName = role["school_name"] ?? "";
-
     final groupId = role["group_id"] ?? 0;
     final regionId = role["region_id"] ?? 0;
     final schoolId = role["school_id"] ?? 0;
 
     print("💾 Salvando dados:");
-    print("👤 $userName");
-    print("🎭 $roleName");
-    print("🏢 $groupName");
-    print("🏫 $schoolName");
+    print("👤 Usuário: $userName");
+    print("🎭 Role: $roleName");
+    print("🏢 Group ID: $groupId");
 
-    // 🔐 TOKEN
+    // Tokens
     await prefs.setString("token", token);
     await prefs.setString("group_token", token);
+    await prefs.setString("auth_token", token);
 
-    // 👤 USER
+    // Dados do usuário
     await prefs.setString("user", jsonEncode(data));
     await prefs.setString("user_name", userName);
     await prefs.setString("user_photo", userPhoto);
     await prefs.setString("user_role", roleName);
 
-    // 🏢 GROUP
+    // Group
     await prefs.setString("group_name", groupName);
     await prefs.setInt("group_id", groupId);
 
-    // 🗺️ REGION
+    // Region
     await prefs.setString("region_name", regionName);
     await prefs.setInt("region_id", regionId);
 
-    // 🏫 SCHOOL
+    // School
     await prefs.setString("school_name", schoolName);
     await prefs.setInt("school_id", schoolId);
 
     print("✅ Dados salvos com sucesso");
   }
 
-  // 🔥 Método genérico para chamadas autenticadas
+  // Método genérico para chamadas GET autenticadas
   Future<http.Response?> get(String url) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -105,13 +94,26 @@ class AuthService {
         return null;
       }
 
-      return await http.get(
-        Uri.parse(url),
+      // Se a URL for relativa, completa com o proxy
+      final fullUrl = url.startsWith("http")
+          ? Uri.parse(url)
+          : Uri.parse("$mainApiUrl$url");
+
+      print("➡️ GET ${fullUrl}");
+      print(
+        "   Token: ${token.substring(0, token.length > 20 ? 20 : token.length)}...",
+      );
+
+      final response = await http.get(
+        fullUrl,
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         },
       );
+
+      print("⬅️ GET Status: ${response.statusCode}");
+      return response;
     } catch (e) {
       print("❌ Erro GET: $e");
       return null;
@@ -120,9 +122,7 @@ class AuthService {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.clear();
-
     print("👋 Logout completo");
   }
 }
