@@ -1,103 +1,93 @@
+// answer_sheet_api_service.dart
 import 'dart:convert';
-import 'dart:io';
-import '../controller/api_config.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+import '../../../config.dart'; // 🔥 Importa a configuração centralizada
 
 class AnswerSheetApiService {
-  static const String baseUrl = ApiConfig.baseUrl;
-  
-  Future<List<String?>> processAnswerSheet(File imageFile, int numberOfQuestions) async {
-    HttpClient? httpClient;
-    
+  Future<List<String?>> processAnswerSheet(
+    dynamic imageFile,
+    int numberOfQuestions,
+  ) async {
     try {
       print("📤 [AnswerSheetApiService] Enviando imagem para API...");
       print("   Número de questões: $numberOfQuestions");
-      print("   Caminho da imagem: ${imageFile.path}");
-      
-      // Check if file exists and get its size
-      if (!await imageFile.exists()) {
-        throw Exception("Arquivo de imagem não encontrado");
+      print("   Base URL: $omrApiUrl"); // 🔥 Usa a URL do config.dart
+
+      // 🔥 Validação importante
+      if (kIsWeb && imageFile is! Uint8List) {
+        throw Exception("Na WEB, imageFile deve ser Uint8List");
       }
-      
-      final fileSize = await imageFile.length();
-      print("   Tamanho do arquivo: $fileSize bytes");
-      
-      // Escolher a rota baseada no número de questões
-      final endpoint = numberOfQuestions == 20 
-          ? "/processar_20_questoes" 
+
+      if (!kIsWeb && imageFile == null) {
+        throw Exception("Imagem inválida");
+      }
+
+      // Escolher endpoint baseado no número de questões
+      final endpoint = numberOfQuestions == 20
+          ? "/processar_20_questoes"
           : "/processar_10_questoes";
-          
-      print("   📍 Usando endpoint: $endpoint (baseado em $numberOfQuestions questões)");
-      final uri = Uri.parse("$baseUrl$endpoint");
+
+      print(
+        "   📍 Usando endpoint: $endpoint (baseado em $numberOfQuestions questões)",
+      );
+
+      // 🔥 Usa a URL do config.dart
+      final uri = Uri.parse("$omrApiUrl$endpoint");
+
       print("   URL: $uri");
-      
-      // Criar HttpClient com timeout
-      httpClient = HttpClient()
-        ..badCertificateCallback = 
-            ((X509Certificate cert, String host, int port) => true)
-        ..connectionTimeout = const Duration(seconds: 30);
-      
-      final request = await httpClient.postUrl(uri);
-      
-      // Criar boundary para multipart
-      final boundary = '----FlutterBoundary${DateTime.now().millisecondsSinceEpoch}';
-      final contentType = 'multipart/form-data; boundary=$boundary';
-      request.headers.set('Content-Type', contentType);
-      request.headers.set('Accept', 'application/json');
-      
-      // Ler a imagem
-      final bytes = await imageFile.readAsBytes();
-      print("   Imagem carregada: ${bytes.length} bytes");
-      
-      // Criar o corpo multipart manualmente
-      // ignore: deprecated_export_use
-      final buffer = BytesBuilder();
-      
-      // Adicionar o arquivo
-      buffer.add(utf8.encode('--$boundary\r\n'));
-      buffer.add(utf8.encode('Content-Disposition: form-data; name="file"; filename="answer_sheet.jpg"\r\n'));
-      buffer.add(utf8.encode('Content-Type: image/jpeg\r\n\r\n'));
-      buffer.add(bytes);
-      buffer.add(utf8.encode('\r\n'));
-      
-      // Finalizar boundary
-      buffer.add(utf8.encode('--$boundary--\r\n'));
-      
-      // Enviar os dados
-      request.add(buffer.toBytes());
-      
-      // Enviar e receber resposta
+
+      final request = http.MultipartRequest("POST", uri);
+
+      request.headers.addAll({"Accept": "application/json"});
+
+      // 🔥 Parte mais importante - anexar a imagem
+      if (kIsWeb) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'file',
+            imageFile,
+            filename: 'answer_sheet.jpg',
+            contentType: http.MediaType('image', 'jpeg'),
+          ),
+        );
+      } else {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'file',
+            imageFile.path,
+            contentType: http.MediaType('image', 'jpeg'),
+          ),
+        );
+      }
+
       print("   Enviando requisição...");
-      final response = await request.close();
-      
-      print("   Status Code: ${response.statusCode}");
-      
-      // Ler resposta com timeout
-      final responseBody = await response.transform(utf8.decoder).join();
-      
-      print("⬅️ [AnswerSheetApiService] Response Body: $responseBody");
-      
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      print("⬅️ Status Code: ${response.statusCode}");
+      print(
+        "⬅️ Response Body: ${responseBody.substring(0, responseBody.length > 200 ? 200 : responseBody.length)}...",
+      );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
-        
+
         if (data["success"] == true) {
-          // Processar as respostas no formato da sua API
           final respostasRaw = data["respostas"] as List;
           final totalQuestoes = data["questoes"] as int;
-          
-          print("   Total de questões esperadas: $totalQuestoes");
-          print("   Respostas recebidas: ${respostasRaw.length}");
-          
-          // Criar lista de respostas no formato esperado pelo app
-          List<String?> extractedAnswers = List<String?>.filled(totalQuestoes, null);
-          
-          // Preencher as respostas
+
+          List<String?> extractedAnswers = List<String?>.filled(
+            totalQuestoes,
+            null,
+          );
+
           for (var item in respostasRaw) {
             final numero = item["numero"] as int;
             final resposta = item["resposta"] as String?;
             final respondida = item["respondida"] as bool;
-            
-            print("   Questão $numero: respondida=$respondida, resposta=$resposta");
-            
+
             if (respondida && resposta != null && resposta.isNotEmpty) {
               final index = numero - 1;
               if (index < extractedAnswers.length) {
@@ -105,12 +95,13 @@ class AnswerSheetApiService {
               }
             }
           }
-          
-          final totalRespondidas = extractedAnswers.where((a) => a != null).length;
-          print("✅ [AnswerSheetApiService] Processamento concluído");
-          print("   Total de respostas detectadas: $totalRespondidas de $totalQuestoes");
-          
-          httpClient.close();
+
+          print("✅ Processamento concluído");
+          print(
+            "   Total respondidas: ${extractedAnswers.where((a) => a != null).length}",
+          );
+          print("   Respostas: $extractedAnswers");
+
           return extractedAnswers;
         } else {
           throw Exception(data["message"] ?? "Erro ao processar imagem");
@@ -118,53 +109,26 @@ class AnswerSheetApiService {
       } else {
         throw Exception("Erro HTTP ${response.statusCode}: $responseBody");
       }
-      
-    } catch (e) {
+    } catch (e, stack) {
       print("❌ [AnswerSheetApiService] Erro: $e");
-      print("   Stack trace: ${StackTrace.current}");
+      print("📍 Stack: $stack");
       rethrow;
-    } finally {
-      httpClient?.close();
     }
   }
-  
-  // Método para testar a conexão com a API
+
   Future<bool> testConnection() async {
-    HttpClient? httpClient;
-    
     try {
-      print("🔌 [AnswerSheetApiService] Testando conexão com a API...");
-      final uri = Uri.parse("$baseUrl/");
-      
-      httpClient = HttpClient()
-        ..badCertificateCallback = 
-            ((X509Certificate cert, String host, int port) => true)
-        ..connectionTimeout = const Duration(seconds: 10);
-      
-      final request = await httpClient.getUrl(uri);
-      final response = await request.close();
-      
-      if (response.statusCode == 200) {
-        final responseBody = await response.transform(utf8.decoder).join();
-        final data = jsonDecode(responseBody);
-        print("✅ [AnswerSheetApiService] Conexão OK!");
-        print("   Resposta: ${data['message']}");
-        httpClient.close();
-        return true;
-      } else {
-        print("❌ [AnswerSheetApiService] Erro na conexão: ${response.statusCode}");
-        httpClient.close();
-        return false;
-      }
+      print("🔌 Testando conexão com a API OMR...");
+      print("   URL: $omrApiUrl"); // 🔥 Usa a URL do config.dart
+
+      final response = await http.get(Uri.parse("$omrApiUrl/"));
+
+      print("   Status: ${response.statusCode}");
+
+      return response.statusCode == 200;
     } catch (e) {
-      print("❌ [AnswerSheetApiService] Erro de conexão: $e");
-      print("   Verifique se:");
-      print("   1. O servidor está rodando: $baseUrl");
-      print("   2. O celular tem acesso à internet");
-      print("   3. O servidor Render está online");
+      print("❌ Erro de conexão: $e");
       return false;
-    } finally {
-      httpClient?.close();
     }
   }
 }

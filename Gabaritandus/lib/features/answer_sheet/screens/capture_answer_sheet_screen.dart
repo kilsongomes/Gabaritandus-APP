@@ -1,4 +1,5 @@
 // lib/features/exams/screens/capture_answer_sheet_screen.dart
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -204,10 +205,12 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     if (controller.capturedImage != null) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.file(
-          File(controller.capturedImage!.path),
-          fit: BoxFit.contain,
-        ),
+        child: kIsWeb
+            ? Image.network(controller.capturedImage!.path, fit: BoxFit.contain)
+            : Image.file(
+                File(controller.capturedImage!.path),
+                fit: BoxFit.contain,
+              ),
       );
     }
 
