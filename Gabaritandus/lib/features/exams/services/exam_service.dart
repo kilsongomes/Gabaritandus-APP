@@ -1,14 +1,11 @@
-// exam_service.dart - WEB VERSION
+// exam_service.dart - SIMPLIFICAR
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 
 class ExamService {
-  static String baseUrl = kIsWeb
-      ? "http://localhost:3000/api"
-      : "https://adrbackend.educandus.com.br";
+  static const String baseUrl = "https://adrbackend.educandus.com.br";
 
   Future<int?> _getGroupId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -63,6 +60,10 @@ class ExamService {
   }
 
   Future<List<Map<String, dynamic>>> getExamsByGroupId(int groupId) async {
+    final HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          ((X509Certificate cert, String host, int port) => true);
+
     try {
       final token = await _getGroupToken();
 
@@ -78,17 +79,14 @@ class ExamService {
       print("URL: $url");
       print("Token: ${token.substring(0, min(20, token.length))}...");
 
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+      final request = await httpClient.getUrl(url);
+      request.headers.set('Content-Type', 'application/json');
+      request.headers.set('Authorization', 'Bearer $token');
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
 
       print("⬅️ [ExamService] Status: ${response.statusCode}");
-
-      final responseBody = response.body;
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
@@ -97,7 +95,6 @@ class ExamService {
           final exams = List<Map<String, dynamic>>.from(
             data["data"]["exams"] ?? [],
           );
-
           print("✅ [ExamService] ${exams.length} exames encontrados");
 
           if (exams.isNotEmpty) {
@@ -123,10 +120,16 @@ class ExamService {
       print("❌ [ExamService] Erro ao buscar exames: $e");
       print("Stack trace: ${e.toString()}");
       rethrow;
+    } finally {
+      httpClient.close();
     }
   }
 
   Future<Map<String, dynamic>> getExamDetails(String examId) async {
+    final HttpClient httpClient = HttpClient()
+      ..badCertificateCallback =
+          ((X509Certificate cert, String host, int port) => true);
+
     try {
       final token = await _getGroupToken();
       final groupId = await _getGroupId();
@@ -144,32 +147,28 @@ class ExamService {
       if (regionId == null) {
         print("⚠️ [ExamService] Region ID não disponível, usando fallback 14");
       }
-
+      
       if (schoolId == null) {
-        print(
-          "⚠️ [ExamService] School ID não disponível, usando fallback 7558",
-        );
-      }
+        print("⚠️ [ExamService] School ID não disponível, usando fallback 7558");
+      } 
 
+      // 
       final url = Uri.parse(
         "$baseUrl/user/list-users-by-exam-schedules/$examId?pageSize=100&groupId=$groupId&page=0&regionId=${regionId ?? 14}&schoolId=${schoolId ?? 7558}",
       );
-
+      
       print("➡️ [ExamService] Buscando detalhes do exame: $examId");
       print("URL: $url");
       print("Group ID usado: $groupId");
 
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+      final request = await httpClient.getUrl(url);
+      request.headers.set('Content-Type', 'application/json');
+      request.headers.set('Authorization', 'Bearer $token');
+
+      final response = await request.close();
+      final responseBody = await response.transform(utf8.decoder).join();
 
       print("⬅️ [ExamService] Status: ${response.statusCode}");
-
-      final responseBody = response.body;
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody);
@@ -190,6 +189,8 @@ class ExamService {
     } catch (e) {
       print("❌ [ExamService] Erro ao buscar detalhes do exame: $e");
       rethrow;
+    } finally {
+      httpClient.close();
     }
   }
 }
