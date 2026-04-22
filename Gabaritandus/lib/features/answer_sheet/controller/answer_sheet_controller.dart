@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -64,7 +65,7 @@ class AnswerSheetController extends ChangeNotifier {
             examName: examName,
             studentId: studentId,
             examId: examId,
-            numberOfQuestions: numberOfQuestions
+            numberOfQuestions: numberOfQuestions,
           ),
         ),
       );
@@ -141,23 +142,28 @@ class AnswerSheetController extends ChangeNotifier {
     try {
       print("⚙️ [AnswerSheetController] Processando imagem...");
 
-      // Converter XFile para File
-      final File imageFile = File(image.path);
-
-      // Processar com o reader
-      // Processar com o reader, passando o número de questões
       if (_currentNumberOfQuestions == null) {
         throw Exception("Número de questões não definido");
       }
 
-      print("   🚀 Chamando processAnswerSheet com ${_currentNumberOfQuestions} questões");
+      if (kIsWeb) {
+        // 🌐 WEB → usar bytes
+        final bytes = await image.readAsBytes();
 
-      _extractedAnswers = await _reader.processAnswerSheet(
-        imageFile,
-        _currentNumberOfQuestions!,
-      );
+        _extractedAnswers = await _reader.processAnswerSheet(
+          bytes,
+          _currentNumberOfQuestions!,
+        );
+      } else {
+        // 📱 MOBILE → usar File
+        final file = File(image.path);
 
-      // Ajustar a lista de questões editadas para o número correto
+        _extractedAnswers = await _reader.processAnswerSheet(
+          file,
+          _currentNumberOfQuestions!,
+        );
+      }
+
       _editedQuestions = List.filled(_extractedAnswers!.length, false);
 
       print("✅ [AnswerSheetController] Processamento concluído");
