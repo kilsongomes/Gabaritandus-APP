@@ -129,6 +129,14 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
+                            const Text(
+                              "Avaliação",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             Text(
                               widget.examName,
                               style: const TextStyle(
@@ -267,7 +275,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                 Row(
                   children: [
                     const Text(
-                      "Respostas detectadas:",
+                      "Respostas detectadas",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -343,8 +351,8 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           Expanded(
             child: Scrollbar(
               controller: _answersScrollController,
-              thumbVisibility: true, // 🔥 Barra de scroll sempre visível
-              trackVisibility: true, // 🔥 Mostra a trilha da barra
+              thumbVisibility: true, // Barra de scroll sempre visível
+              trackVisibility: true, // Mostra a trilha da barra
               radius: const Radius.circular(8),
               thickness: 6,
               child: SingleChildScrollView(
@@ -383,17 +391,25 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                       displayText = answer;
                     }
 
-                    return Chip(
-                      label: Text("$formattedNumber. $displayText"),
+                    return SizedBox(
+                    width: 90, // Largura fixa para todos os chips
+                    child: Chip(
+                      label: Center(
+                        child: Text(
+                          "$formattedNumber. $displayText",
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ),
                       backgroundColor: chipColor,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
+                        horizontal: 4,
                         vertical: 4,
                       ),
                       visualDensity: VisualDensity.compact,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    );
-                  }).toList(),
+                    ),
+                  );
+                }).toList(),
                 ),
               ),
             ),
@@ -411,7 +427,7 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           Expanded(
             child: OutlinedButton.icon(
               icon: const Icon(Icons.refresh),
-              label: const Text("Nova Captura"),
+              label: const Text("Nova captura"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff004aad),
                 foregroundColor: Colors.white,
