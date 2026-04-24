@@ -47,7 +47,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Editar Respostas"),
+        title: const Text("Editar respostas"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
         // 🔥 Botão Salvar removido da AppBar
@@ -114,7 +114,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                 itemBuilder: (context, index) {
                   // Se for o último item, mostrar o botão Salvar
                   if (index == _editedAnswers.length) {
-                    return Padding(
+                    return Padding(                      
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: ElevatedButton.icon(
                         onPressed: _saveChanges,
@@ -143,6 +143,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                   final wasEdited = _locallyEdited[index];                  
 
                   return Card(
+                    color: const Color(0xffe5edfa),
                     margin: const EdgeInsets.only(bottom: 12),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
