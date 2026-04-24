@@ -82,7 +82,7 @@ void initState() {
                   child: Text(
                     hasSearch
                         ? "Mostrando $showing de $total Avaliações"
-                        : "Total: $total Avaliações",
+                        : "Total: $total avaliações",
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                 );
