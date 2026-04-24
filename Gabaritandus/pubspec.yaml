@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.20.2
   http_parser: ^4.0.2
   scanner_overlay: ^0.0.2
+  bootstrap_icons: ^1.13.1
  
 
 dev_dependencies:

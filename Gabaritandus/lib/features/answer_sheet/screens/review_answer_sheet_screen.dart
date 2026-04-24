@@ -1,5 +1,6 @@
 // lib/features/answer_sheet/screens/review_answer_sheet_screen.dart
 import 'package:flutter/material.dart';
+import 'package:bootstrap_icons/bootstrap_icons.dart';
 
 class ReviewAnswerSheetScreen extends StatelessWidget {
   final String studentName;
@@ -19,7 +20,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Revisar Gabarito"),
+        title: const Text("Revisar gabarito"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
         // Botão FINALIZAR removido da AppBar
@@ -96,6 +97,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
+                  color: Color(0xffe5edfa),
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundColor: const Color(0xff004aad),
@@ -202,23 +204,23 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatItem(
-            "Identificadas",
+            "Questões",
             "$answered/$total",
-            Icons.check_circle,
+            BootstrapIcons.check_circle,
             Color(0xFF004aad),
           ),
           Container(width: 1, height: 30, color: Colors.grey[300]),
           _buildStatItem(
-            "Branco",
+            "Em branco",
             blankAnswers.toString(),
-            Icons.radio_button_unchecked,
+            BootstrapIcons.circle,
             Colors.blue,
           ),
           Container(width: 1, height: 30, color: Colors.grey[300]),
           _buildStatItem(
-            "Marc. Dupla",
+            "Marcação dupla",
             doubleMarks.toString(),
-            Icons.change_circle,
+            BootstrapIcons.dash_circle,
             Colors.purple,
           ),
         ],
