@@ -28,48 +28,22 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
     return unanswered;
   }
 
-  /// Formata a lista de questões para exibição
+  // Formata a lista de questões para exibição
   String _formatQuestionsList(List<int> questions) {
     if (questions.isEmpty) return '';
-    
+
     if (questions.length == 1) {
-      return '${questions[0]}';
+      return 'a questão ${questions[0]}';
     }
-    
-    // Verificar se são questões consecutivas
-    final List<String> parts = [];
-    int start = questions[0];
-    int end = questions[0];
-    
-    for (int i = 1; i < questions.length; i++) {
-      if (questions[i] == end + 1) {
-        end = questions[i];
-      } else {
-        if (start == end) {
-          parts.add('$start');
-        } else {
-          parts.add('$start-$end');
-        }
-        start = questions[i];
-        end = questions[i];
-      }
+
+    if (questions.length == 2) {
+      return 'as questões ${questions[0]} e ${questions[1]}';
     }
-    
-    // Adicionar o último intervalo
-    if (start == end) {
-      parts.add('$start');
-    } else {
-      parts.add('$start-$end');
-    }
-    
-    if (parts.length == 1) {
-      return parts[0];
-    } else if (parts.length == 2) {
-      return '${parts[0]} e ${parts[1]}';
-    } else {
-      final lastPart = parts.removeLast();
-      return '${parts.join(', ')} e $lastPart';
-    }
+
+    // Para 3 ou mais questões, separar por vírgulas e "e" antes do último
+    final lastQuestion = questions.removeLast();
+    final formattedList = questions.join(', ');
+    return 'as questões $formattedList e $lastQuestion';
   }
 
   /// Mostra modal de aviso para respostas faltantes
@@ -80,146 +54,131 @@ class AnswerSheetConfirmationController extends ChangeNotifier {
   }) async {
     final unansweredQuestions = getUnansweredQuestions(answers);
     final formattedQuestions = _formatQuestionsList(unansweredQuestions);
-    
+
     return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, size: 28),
-            SizedBox(width: 8),
-            Text(
-              "Atenção!",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                
-              ),
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            backgroundColor: Color(0xffe5edfa),
+            title: Row(
+              children: const [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  size: 28,
+                  color: Colors.orange,
+                ),
+                SizedBox(width: 10), // Espaço entre o ícone e o texto
+                Text(
+                  "Atenção!",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [            
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.orange[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.edit_note, color: Colors.grey[800], size: 24),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      "Antes de enviar, revise e edite as alternativas ${unansweredQuestions.length == 1 ? '' : 'das questões '}$formattedQuestions",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize
+                  .min, // Importante: faz a coluna ocupar o espaço mínimo
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Antes de enviar, revise e edite $formattedQuestions.",
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                const SizedBox(height: 20), // Espaço antes da linha
+                const Divider(
+                  color: Colors.grey, // Cor da linha
+                  thickness: 1, // Grossura da linha
+                  height: 1, // Espaço que o widget ocupa
+                ),
+              ],
             ),
-            const SizedBox(height: 16),            
-          ],
-        ),
-        actions: [          
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: Center(child: const Text("Entendi")),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xff004aad),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Center(child: Text("Fechar")),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   /// Mostra modal de sucesso quando todas respostas são identificadas
   Future<bool> showSuccessDialog(
-  BuildContext context, {
-  required List<String?> answers,
-  required int numberOfQuestions, // Adicionar este parâmetro
-}) async {
-  final answeredCount = answers.where((a) => a != null).length;
-  final totalCount = answers.length;
-  
-  
-  return await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Row(
-        children: [          
-          Center(
-            child: Text(
-              "Gabarito Completo!",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,              
-              ),
-            ),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [          
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.blue[200]!),
-            ),
-            child: Row(
+    BuildContext context, {
+    required List<String?> answers,
+    required int numberOfQuestions, // Adicionar este parâmetro
+  }) async {
+    final answeredCount = answers.where((a) => a != null).length;
+    final totalCount = answers.length;
+
+    return await showDialog<bool>(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Color(0xffe5edfa),
+            title: Row(
               children: [
-                Icon(Icons.verified, color: Color(0xFF004aad), size: 24),
+                Icon(
+                  Icons.check_circle_outline,
+                  color: const Color(0xFF004aad),
+                  size: 28,
+                ),
+
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    "$answeredCount de $totalCount respostas detectadas corretamente",
-                    style: TextStyle(
-                      fontSize: 14,                      
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                const Text(
+                  "Gabarito Completo!",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-          ),                    
-        ],
-      ),
-      actions: [        
-        Center(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF004aad),
-              foregroundColor: Colors.white,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                // Agora apenas o ícone e o texto, sem o Container azul
+                Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "$answeredCount de $totalCount respostas detectadas corretamente",
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24), // Espaçamento antes da linha
+                const Divider(color: Colors.grey, thickness: 1, height: 1),
+              ],
             ),
-            child: const Text("Revisar Gabarito"),
+            actions: [
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF004aad),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Revisar Gabarito"),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  ) ?? false;
-}
+        ) ??
+        false;
+  }
 
   /// Mostra modal de loading
   void showLoadingDialog(BuildContext context) {
