@@ -265,46 +265,59 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
 
   void _confirmAndFinish(BuildContext context) {
     showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => AlertDialog(
-      title: const Row(
-        children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 28),
-          SizedBox(width: 8),
-          Text(
-            "Gabarito finalizado!",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+      
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color(0xffe5edfa),
+        title: const Row(
+          children: [
+            Icon(Icons.check_circle_outline, color: Colors.green, size: 28),
+            SizedBox(width: 8),
+            Text(
+              "Gabarito finalizado!",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min, // Garante que o diálogo não estique
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Gabarito de ${studentName.toUpperCase()} registrado.",
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20), // Espaço entre o texto e a linha
+            const Divider(color: Colors.grey, thickness: 1, height: 1),
+          ],
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Fecha o dialog
+                Navigator.pop(
+                  context,
+                  true,
+                ); // Retorna true para a CaptureScreen
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff004aad),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+              ),
+              child: const Text(
+                "Fechar",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],
       ),
-      content: Text(
-        "Gabarito de \"$studentName\" registrado.",
-        style: const TextStyle(fontSize: 16),
-      ),
-      actions: [
-        Center(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Fecha o dialog
-              Navigator.pop(context, true); // Retorna true para a CaptureScreen
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xff004aad),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-            ),
-            child: const Text(
-              "OK",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
+    );
   }
 }
