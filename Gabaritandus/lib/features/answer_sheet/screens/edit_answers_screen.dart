@@ -204,7 +204,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                               },
                               icon: const Icon(Icons.close),
                               label: const Text(
-                                "CANCELAR",
+                                "Cancelar",
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -221,13 +221,13 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          // Botão Salvar e Revisar
+                          // Botão Salvar
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: _saveAndReview,
                               icon: const Icon(Icons.save, color: Colors.white),
                               label: const Text(
-                                "SALVAR E REVISAR",
+                                "Salvar",
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
