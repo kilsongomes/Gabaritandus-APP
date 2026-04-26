@@ -1,5 +1,6 @@
 // lib/features/exams/screens/edit_answers_screen.dart
 import 'package:flutter/material.dart';
+import '../../answer_sheet/screens/review_answer_sheet_screen.dart';
 
 class EditAnswersScreen extends StatefulWidget {
   final String studentName;
@@ -50,7 +51,6 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
         title: const Text("Editar respostas"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
-        // 🔥 Botão Salvar removido da AppBar
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -112,28 +112,60 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                 padding: EdgeInsets.zero,
                 itemCount: _editedAnswers.length + 1, // +1 para o botão
                 itemBuilder: (context, index) {
-                  // Se for o último item, mostrar o botão Salvar
+                  // Se for o último item, mostrar o botão
                   if (index == _editedAnswers.length) {
                     return Padding(                      
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: ElevatedButton.icon(
-                        onPressed: _saveChanges,
-                        icon: const Icon(Icons.save, color: Colors.white),
-                        label: const Text(
-                          "SALVAR ALTERAÇÕES",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                      child: Row(
+                        children: [
+                          // Botão Cancelar
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context); // Volta sem salvar
+                              },
+                              icon: const Icon(Icons.close),
+                              label: const Text(
+                                "CANCELAR",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(color: Colors.red),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(width: 12),
+                          // Botão Salvar e Revisar
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _saveAndReview,
+                              icon: const Icon(Icons.save, color: Colors.white),
+                              label: const Text(
+                                "SALVAR",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     );
                   }
@@ -239,7 +271,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                           
                           const SizedBox(height: 20),
                           
-                          // Botões Branco e Marcação Dupla (sem símbolos internos)
+                          // Botões Branco e Marcação Dupla
                           Row(
                             children: [
                               Expanded(
@@ -346,10 +378,21 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
     );
   }
 
-  void _saveChanges() {
-    // Chamar o callback com as respostas editadas
+  void _saveAndReview() {
+    // Atualizar as respostas no controller
     widget.onAnswersUpdated(_editedAnswers);
-    // Voltar para tela anterior
-    Navigator.pop(context);
+    
+    // Navegar diretamente para a tela de revisão
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ReviewAnswerSheetScreen(
+          studentName: widget.studentName,
+          examName: widget.examName,
+          answers: _editedAnswers,
+          numberOfQuestions: widget.numberOfQuestions,
+        ),
+      ),
+    );
   }
 }

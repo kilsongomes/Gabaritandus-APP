@@ -6,7 +6,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
   final String studentName;
   final String examName;
   final List<String?> answers;
-  final int numberOfQuestions; // Adicionado
+  final int numberOfQuestions;
 
   const ReviewAnswerSheetScreen({
     super.key,
@@ -23,7 +23,6 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
         title: const Text("Revisar gabarito"),
         backgroundColor: const Color(0xff004aad),
         foregroundColor: Colors.white,
-        // Botão FINALIZAR removido da AppBar
       ),
       body: Column(
         children: [
@@ -148,7 +147,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // Botão Editar Respostas (Outlined)
+                // Botão Editar Respostas
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.edit),
@@ -159,15 +158,16 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     onPressed: () {
-                      // Voltar para edição
-                      Navigator.pop(context);
+                      // Voltar para edição (pop atual e depois pop da capture?)
+                      Navigator.pop(context); // Volta para CaptureAnswerSheetScreen
                     },
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Botão Finalizar (Elevated, verde)
+                // Botão Finalizar
                 Expanded(
                   child: ElevatedButton.icon(
+                    icon: const Icon(Icons.check_circle),
                     label: const Text("FINALIZAR"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -207,7 +207,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
             "Questões",
             "$answered/$total",
             BootstrapIcons.check_circle,
-            Color(0xFF004aad),
+            const Color(0xFF004aad),
           ),
           Container(width: 1, height: 30, color: Colors.grey[300]),
           _buildStatItem(
@@ -265,11 +265,10 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
 
   void _confirmAndFinish(BuildContext context) {
     showDialog(
-      
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: Color(0xffe5edfa),
+        backgroundColor: const Color(0xffe5edfa),
         title: const Row(
           children: [
             Icon(Icons.check_circle_outline, color: Colors.green, size: 28),
@@ -281,14 +280,14 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
           ],
         ),
         content: Column(
-          mainAxisSize: MainAxisSize.min, // Garante que o diálogo não estique
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "Gabarito de ${studentName.toUpperCase()} registrado.",
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 20), // Espaço entre o texto e a linha
+            const SizedBox(height: 20),
             const Divider(color: Colors.grey, thickness: 1, height: 1),
           ],
         ),
@@ -296,11 +295,12 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
           Center(
             child: ElevatedButton(
               onPressed: () {
+                // 🔥 Fechar o dialog e voltar DIRETO para ExamStudentsScreen
                 Navigator.pop(context); // Fecha o dialog
-                Navigator.pop(
-                  context,
-                  true,
-                ); // Retorna true para a CaptureScreen
+                
+                // 🔥 Voltar 2 telas: ReviewScreen e CaptureScreen
+                Navigator.pop(context); // Sai do ReviewScreen
+                Navigator.pop(context, true); // Sai do CaptureScreen e volta para ExamStudentsScreen com resultado true
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff004aad),

@@ -201,200 +201,200 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     );
   }
 
-// Mostra a imagem em tela cheia com zoom
-void _showFullScreenImage(AnswerSheetController controller) {
-  if (controller.capturedImage == null) return;
+  // Mostra a imagem em tela cheia com zoom
+  void _showFullScreenImage(AnswerSheetController controller) {
+    if (controller.capturedImage == null) return;
 
-  showDialog(
-    context: context,
-    barrierDismissible: true,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Color(0xffe5edfa),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.9,
-          height: MediaQuery.of(context).size.height * 0.8,
-          decoration: BoxDecoration(
-            color: Color(0xffe5edfa),
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Color(0xffe5edfa),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Stack(
-            children: [
-              // Container de clipe para manter o zoom dentro dos limites
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: InteractiveViewer(
-                  minScale: 0.5,
-                  maxScale: 3.0,
-                  boundaryMargin: const EdgeInsets.all(20), // 🔥 Margem para o zoom não sair
-                  constrained: true, // 🔥 Mantém dentro dos limites
-                  child: Center(
-                    child: kIsWeb
-                        ? Image.network(
-                            controller.capturedImage!.path,
-                            fit: BoxFit.contain,
-                          )
-                        : Image.file(
-                            File(controller.capturedImage!.path),
-                            fit: BoxFit.contain,
-                          ),
-                  ),
-                ),
-              ),
-            
-            // Botão Fechar (X) no canto superior direito
-            Positioned(
-              top: 2,
-              right: 16,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xffe5edfa).withValues(alpha: 0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: const Icon(
-                    Icons.close,
-                    color: Colors.black,
-                    size: 28,
-                  ),
-                ),
-              ),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: BoxDecoration(
+              color: Color(0xffe5edfa),
+              borderRadius: BorderRadius.circular(20),
             ),
-            
-            // Instrução para zoom (opcional)
-            Positioned(
-              bottom: 20,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    "👆 Use dois dedos para dar zoom",
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+            child: Stack(
+              children: [
+                // Container de clipe para manter o zoom dentro dos limites
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 3.0,
+                    boundaryMargin: const EdgeInsets.all(
+                      20,
+                    ), // 🔥 Margem para o zoom não sair
+                    constrained: true, // 🔥 Mantém dentro dos limites
+                    child: Center(
+                      child: kIsWeb
+                          ? Image.network(
+                              controller.capturedImage!.path,
+                              fit: BoxFit.contain,
+                            )
+                          : Image.file(
+                              File(controller.capturedImage!.path),
+                              fit: BoxFit.contain,
+                            ),
+                    ),
                   ),
                 ),
-              ),
+
+                // Botão Fechar (X) no canto superior direito
+                Positioned(
+                  top: 2,
+                  right: 16,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xffe5edfa).withValues(alpha: 0.6),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.black,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Instrução para zoom (opcional)
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        "👆 Use dois dedos para dar zoom",
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildImagePreview(AnswerSheetController controller) {
+    if (controller.isProcessing) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 16),
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text(
+              "Analisando respostas...",
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
-      ));
-    },
-  );
-}
-  Widget _buildImagePreview(AnswerSheetController controller) {
-  if (controller.isProcessing) {
-    return const Center(
+      );
+    }
+
+    if (controller.capturedImage != null) {
+      return GestureDetector(
+        onTap: () => _showFullScreenImage(controller),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.black.withValues(alpha: 0.05),
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Imagem
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: kIsWeb
+                    ? Image.network(
+                        controller.capturedImage!.path,
+                        fit: BoxFit.contain,
+                      )
+                    : Image.file(
+                        File(controller.capturedImage!.path),
+                        fit: BoxFit.contain,
+                      ),
+              ),
+
+              // Overlay com ícone de zoom (indica que é clicável)
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.zoom_in, color: Colors.white, size: 18),
+                      SizedBox(width: 4),
+                      Text(
+                        "Ampliar",
+                        style: TextStyle(color: Colors.white, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 16),
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
+          Icon(Icons.camera_alt, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
           Text(
-            "Analisando respostas...",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+            "Nenhuma imagem capturada",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Use o botão abaixo para \ncapturar uma imagem",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
-
-  if (controller.capturedImage != null) {
-    return GestureDetector(
-      onTap: () => _showFullScreenImage(controller),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.black.withValues(alpha: 0.05),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Imagem
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: kIsWeb
-                  ? Image.network(
-                      controller.capturedImage!.path,
-                      fit: BoxFit.contain,
-                    )
-                  : Image.file(
-                      File(controller.capturedImage!.path),
-                      fit: BoxFit.contain,
-                    ),
-            ),
-            
-            // Overlay com ícone de zoom (indica que é clicável)
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(6),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.zoom_in,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      "Ampliar",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.camera_alt, size: 64, color: Colors.grey[400]),
-        const SizedBox(height: 16),
-        Text(
-          "Nenhuma imagem capturada",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Use o botão abaixo para \ncapturar uma imagem",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[500],
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
   Widget _buildAnswersSection(AnswerSheetController controller) {
     if (controller.extractedAnswers == null) {
@@ -540,24 +540,24 @@ void _showFullScreenImage(AnswerSheetController controller) {
                     }
 
                     return SizedBox(
-                    width: 90, // Largura fixa para todos os chips
-                    child: Chip(
-                      label: Center(
-                        child: Text(
-                          "$formattedNumber. $displayText",
-                          style: const TextStyle(fontSize: 15),
+                      width: 90, // Largura fixa para todos os chips
+                      child: Chip(
+                        label: Center(
+                          child: Text(
+                            "$formattedNumber. $displayText",
+                            style: const TextStyle(fontSize: 15),
+                          ),
                         ),
+                        backgroundColor: chipColor,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 4,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      backgroundColor: chipColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 4,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
                 ),
               ),
             ),
