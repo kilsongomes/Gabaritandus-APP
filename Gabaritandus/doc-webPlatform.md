@@ -5,7 +5,11 @@
     const String mobileIp = "172.16.0.105";
     ```
 3. Executar o Proxy.
-4. Executar o projeto e ecolher o despositivo:
+4. Executar projeto em web:
     ```
-    flutter run 
+    flutter run -d web-server --web-hostname 0.0.0.0  --web-port 8080
+    ```
+5. Executar projeto em outros dispositivos:
+    ```
+    flutter run
     ```
