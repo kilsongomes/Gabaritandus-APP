@@ -19,8 +19,15 @@ const int proxyPort = 3000;
 /// URL base do proxy (funciona para Web e Mobile)
 String get proxyUrl {
   if (kIsWeb) {
-    return "http://localhost:$proxyPort";
+    final host = Uri.base.host;
+
+    if (host == "localhost" || host == "127.0.0.1") {
+      return "http://localhost:$proxyPort";
+    }
+
+    return "http://$host:$proxyPort";
   }
+
   return "http://$mobileIp:$proxyPort";
 }
 
