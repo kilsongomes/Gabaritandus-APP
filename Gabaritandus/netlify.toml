@@ -1,0 +1,32 @@
+[build]
+  command = """
+  git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter &&
+  export PATH="$HOME/flutter/bin:$PATH" &&
+  flutter config --enable-web &&
+  flutter pub get &&
+  flutter build web
+  """
+  publish = "build/web"
+
+[[redirects]]
+  from = "/login-api"
+  to = "https://back.educandus.com.br/api/login"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://adrbackend.educandus.com.br/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/omr/*"
+  to = "https://omr-fast-api-render.onrender.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
