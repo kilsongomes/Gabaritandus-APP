@@ -1,6 +1,4 @@
 // lib/features/exams/screens/capture_answer_sheet_screen.dart
-import 'package:flutter/foundation.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/answer_sheet_controller.dart';
@@ -234,15 +232,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                     ), // 🔥 Margem para o zoom não sair
                     constrained: true, // 🔥 Mantém dentro dos limites
                     child: Center(
-                      child: kIsWeb
-                          ? Image.network(
-                              controller.capturedImage!.path,
-                              fit: BoxFit.contain,
-                            )
-                          : Image.file(
-                              File(controller.capturedImage!.path),
-                              fit: BoxFit.contain,
-                            ),
+                      child: Image.memory(
+                        controller.capturedImageBytes!,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
@@ -330,15 +323,10 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
               // Imagem
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: kIsWeb
-                    ? Image.network(
-                        controller.capturedImage!.path,
-                        fit: BoxFit.contain,
-                      )
-                    : Image.file(
-                        File(controller.capturedImage!.path),
-                        fit: BoxFit.contain,
-                      ),
+                child: Image.memory(
+                  controller.capturedImageBytes!,
+                  fit: BoxFit.contain,
+                ),
               ),
 
               // Overlay com ícone de zoom (indica que é clicável)
@@ -503,62 +491,25 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
               trackVisibility: true, // Mostra a trilha da barra
               radius: const Radius.circular(8),
               thickness: 6,
-              child: SingleChildScrollView(
+              child: GridView.builder(
                 controller: _answersScrollController,
                 padding: const EdgeInsets.all(12),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: answers.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final answer = entry.value;
-                    final isEdited = controller.editedQuestions[index];
-                    final questionNumber = index + 1;
-                    final formattedNumber = _formatQuestionNumber(
-                      questionNumber,
-                    );
-
-                    Color chipColor;
-                    String displayText;
-
-                    if (isEdited) {
-                      chipColor = Colors.orange[100]!;
-                    } else if (answer == null) {
-                      chipColor = Colors.orange.withValues(alpha: 0.3);
-                    } else {
-                      chipColor = Colors.white10;
-                    }
-
-                    if (answer == null) {
-                      displayText = "?";
-                    } else if (answer == "Em branco") {
-                      displayText = "∅";
-                    } else if (answer == "Marcação dupla") {
-                      displayText = "⊜";
-                    } else {
-                      displayText = answer;
-                    }
-
-                    return SizedBox(
-                      width: 90, // Largura fixa para todos os chips
-                      child: Chip(
-                        label: Center(
-                          child: Text(
-                            "$formattedNumber. $displayText",
-                            style: const TextStyle(fontSize: 15),
-                          ),
-                        ),
-                        backgroundColor: chipColor,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 4,
-                        ),
-                        visualDensity: VisualDensity.compact,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    );
-                  }).toList(),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 110,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 2.65,
                 ),
+                itemCount: answers.length,
+                itemBuilder: (context, index) {
+                  final answer = answers[index];
+                  final isEdited = controller.editedQuestions[index];
+                  return _buildAnswerTile(
+                    index: index,
+                    answer: answer,
+                    isEdited: isEdited,
+                  );
+                },
               ),
             ),
           ),
@@ -633,6 +584,59 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAnswerTile({
+    required int index,
+    required String? answer,
+    required bool isEdited,
+  }) {
+    final questionNumber = index + 1;
+    final formattedNumber = _formatQuestionNumber(questionNumber);
+
+    Color backgroundColor;
+    Color borderColor;
+
+    if (isEdited) {
+      backgroundColor = Colors.orange[100]!;
+      borderColor = Colors.orange;
+    } else if (answer == null) {
+      backgroundColor = Colors.orange.withValues(alpha: 0.3);
+      borderColor = Colors.orange;
+    } else {
+      backgroundColor = Colors.white;
+      borderColor = Colors.blueGrey.shade200;
+    }
+
+    final displayText = answer == null
+        ? "?"
+        : answer == "Em branco"
+        ? "∅"
+        : answer == "Marcação dupla"
+        ? "⊜"
+        : answer;
+
+    return Container(
+      width: double.infinity,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Text(
+            "$formattedNumber. $displayText",
+            maxLines: 1,
+            softWrap: false,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ),
     );
   }
 

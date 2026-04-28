@@ -1,7 +1,7 @@
 // answer_sheet_api_service.dart
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
 import '../../../config.dart'; // 🔥 Importa a configuração centralizada
 
 class AnswerSheetApiService {
@@ -14,12 +14,7 @@ class AnswerSheetApiService {
       print("   Número de questões: $numberOfQuestions");
       print("   Base URL: $omrApiUrl"); // 🔥 Usa a URL do config.dart
 
-      // 🔥 Validação importante
-      if (kIsWeb && imageFile is! Uint8List) {
-        throw Exception("Na WEB, imageFile deve ser Uint8List");
-      }
-
-      if (!kIsWeb && imageFile == null) {
+      if (imageFile == null) {
         throw Exception("Imagem inválida");
       }
 
@@ -42,7 +37,7 @@ class AnswerSheetApiService {
       request.headers.addAll({"Accept": "application/json"});
 
       // 🔥 Parte mais importante - anexar a imagem
-      if (kIsWeb) {
+      if (imageFile is Uint8List) {
         request.files.add(
           http.MultipartFile.fromBytes(
             'file',

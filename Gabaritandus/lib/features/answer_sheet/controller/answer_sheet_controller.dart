@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:gabaritandus/features/answer_sheet/services/answer_sheet_reader.dart';
 import '../screens/camera_with_overlay_screen.dart';
@@ -13,6 +12,7 @@ class AnswerSheetController extends ChangeNotifier {
   String? _error;
   List<String?>? _extractedAnswers;
   XFile? _capturedImage;
+  Uint8List? _capturedImageBytes;
 
   String? _currentStudentName;
   String? _currentExamName;
@@ -24,6 +24,7 @@ class AnswerSheetController extends ChangeNotifier {
   String? get error => _error;
   List<String?>? get extractedAnswers => _extractedAnswers;
   XFile? get capturedImage => _capturedImage;
+  Uint8List? get capturedImageBytes => _capturedImageBytes;
 
   String? get currentStudentName => _currentStudentName;
   String? get currentExamName => _currentExamName;
@@ -72,6 +73,7 @@ class AnswerSheetController extends ChangeNotifier {
 
       if (image != null) {
         _capturedImage = image;
+        _capturedImageBytes = await image.readAsBytes();
         await _processImage(image);
       }
     } catch (e) {
@@ -98,6 +100,7 @@ class AnswerSheetController extends ChangeNotifier {
 
       if (image != null) {
         _capturedImage = image;
+        _capturedImageBytes = await image.readAsBytes();
         await _processImage(image);
       }
     } catch (e) {
@@ -124,6 +127,7 @@ class AnswerSheetController extends ChangeNotifier {
 
       if (image != null) {
         _capturedImage = image;
+        _capturedImageBytes = await image.readAsBytes();
         await _processImage(image);
       }
     } catch (e) {
@@ -146,23 +150,12 @@ class AnswerSheetController extends ChangeNotifier {
         throw Exception("Número de questões não definido");
       }
 
-      if (kIsWeb) {
-        // 🌐 WEB → usar bytes
-        final bytes = await image.readAsBytes();
+      final bytes = await image.readAsBytes();
 
-        _extractedAnswers = await _reader.processAnswerSheet(
-          bytes,
-          _currentNumberOfQuestions!,
-        );
-      } else {
-        // 📱 MOBILE → usar File
-        final file = File(image.path);
-
-        _extractedAnswers = await _reader.processAnswerSheet(
-          file,
-          _currentNumberOfQuestions!,
-        );
-      }
+      _extractedAnswers = await _reader.processAnswerSheet(
+        bytes,
+        _currentNumberOfQuestions!,
+      );
 
       _editedQuestions = List.filled(_extractedAnswers!.length, false);
 
@@ -203,6 +196,7 @@ class AnswerSheetController extends ChangeNotifier {
   // método clear para também resetar as flags
   void clear() {
     _capturedImage = null;
+    _capturedImageBytes = null;
     _extractedAnswers = null;
     _error = null;
     _editedQuestions = List.filled(10, false); // Resetar flags
