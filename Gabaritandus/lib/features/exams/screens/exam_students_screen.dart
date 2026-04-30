@@ -141,6 +141,14 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Text(
+                              "Avaliação",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                         Text(
                           exam["name"] ?? "Exame",
                           style: const TextStyle(
@@ -149,23 +157,17 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                "${exam["grade_name"] ?? "Não informado"}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+                        const Text(
+                              "Total de questões",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
+                            ),                      
                         Row(
                           children: [
+                            
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -201,58 +203,96 @@ class _ExamStudentsScreenState extends State<ExamStudentsScreen> {
                     ? total
                     : _filteredStudents.length;
 
-                if (total == 0 && !controller.loading) return const SizedBox();
-
                 if (controller.loading) {
                   return const Padding(
                     padding: EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      "Carregando estudantes...",
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            "Carregando estudantes...",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            "Status",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 48,
+                          child: Text(
+                            "Ação",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }
 
+                // Exibe o total entre parênteses no título "Estudante"
+                final totalText = _searchQuery.isEmpty
+                    ? "Estudante ($total)"
+                    : "Estudante ($showing de $total)";
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    _searchQuery.isEmpty
-                        ? "Total: $total estudante${total != 1 ? 's' : ''}"
-                        : "Mostrando $showing de $total estudante${total != 1 ? 's' : ''}",
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          totalText,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: const Text(
+                          "Status",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 48,
+                        child: Text(
+                          "Ação",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
-            ),
-
-            // Cabeçalho da lista
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    "Estudante",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    "Status",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(
-                  width: 48,
-                  child: Text(
-                    "Ação",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
             ),
             const Divider(),
 
