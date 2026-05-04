@@ -151,7 +151,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.edit),
-                    label: const Text("Editar Respostas"),
+                    label: const Text("Editar respostas"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
@@ -170,7 +170,7 @@ class ReviewAnswerSheetScreen extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.check_circle),
-                    label: const Text("FINALIZAR"),
+                    label: const Text("Finalizar"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
