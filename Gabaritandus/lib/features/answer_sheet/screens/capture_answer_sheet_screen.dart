@@ -142,22 +142,6 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 3),
-                            const Text(
-                              "Série",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              widget.examGrade,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                             const SizedBox(height: 8),
                           ],
                         ),
@@ -645,16 +629,9 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     final hasAllAnswers = confirmationController.checkAllAnswers(answers);
 
     if (hasAllAnswers) {
-      final shouldReview = await confirmationController.showSuccessDialog(
-        context,
-        answers: answers,
-        numberOfQuestions: widget.numberOfQuestions,
-      );
-
-      if (shouldReview) {
-        _navigateToReviewScreen(answers);
-      }
-    } else {
+  
+  _navigateToReviewScreen(answers);
+} else {
       await confirmationController.showMissingAnswersDialog(
         context,
         answers: answers,
