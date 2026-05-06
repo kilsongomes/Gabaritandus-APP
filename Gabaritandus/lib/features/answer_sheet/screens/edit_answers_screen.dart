@@ -78,7 +78,7 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
     return _locallyEdited.any((edited) => edited == true);
   }
 
-  /// Mostra modal de confirmação ao tentar voltar sem salvar
+  // Mostra modal de confirmação ao tentar voltar sem salvar
   Future<bool> _showBackConfirmationDialog() async {
   return await showDialog<bool>(
         context: context,
@@ -112,50 +112,70 @@ class _EditAnswersScreenState extends State<EditAnswersScreen> {
                 style: TextStyle(fontSize: 16, color: Colors.black87),
               ),
               SizedBox(height: 20),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-                height: 1,
-              ),
+              Divider(color: Colors.grey, thickness: 1, height: 1),
             ],
           ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+          actionsPadding: EdgeInsets.zero,
           actions: [
-            // Botão "Continuar editando" - LARANJA
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: const StadiumBorder(),
-              ),
-              child: const Text(
-                "Continuar editando",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            // Botão "Voltar sem salvar" - AZUL
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff004aad),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: const StadiumBorder(),
-              ),
-              child: const Text(
-                "Voltar sem salvar",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+            // Container para garantir largura total
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+              child: Row(
+                children: [
+                  // Botão "Continuar editando" - LARANJA
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: const StadiumBorder(),
+                      ),
+                      child: const Text(
+                        "Continuar editando",                        
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Botão "Voltar sem salvar" - AZUL
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context, true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff004aad),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: const StadiumBorder(),
+                      ),
+                      child: const Text(
+                        "Voltar sem salvar",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
