@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 
 /// IP do computador onde o proxy está rodando
 /// Descubra seu IP: ipconfig (Windows) ou ifconfig (Mac/Linux)
-const String mobileIp = "172.16.2.35"; // 👈 MUDE AQUI!
+const String mobileIp = "192.168.0.22"; // 👈 MUDE AQUI!
 
 /// Porta do proxy (não mexa a menos que tenha mudado no proxy.js)
 const int proxyPort = 3000;
