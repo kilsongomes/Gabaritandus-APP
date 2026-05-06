@@ -629,16 +629,9 @@ class _CaptureAnswerSheetScreenState extends State<CaptureAnswerSheetScreen> {
     final hasAllAnswers = confirmationController.checkAllAnswers(answers);
 
     if (hasAllAnswers) {
-      final shouldReview = await confirmationController.showSuccessDialog(
-        context,
-        answers: answers,
-        numberOfQuestions: widget.numberOfQuestions,
-      );
-
-      if (shouldReview) {
-        _navigateToReviewScreen(answers);
-      }
-    } else {
+  
+  _navigateToReviewScreen(answers);
+} else {
       await confirmationController.showMissingAnswersDialog(
         context,
         answers: answers,
